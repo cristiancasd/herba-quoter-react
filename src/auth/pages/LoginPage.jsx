@@ -19,7 +19,7 @@ export const LoginPage = () => {
   //Usar Redux 
   const dispatch = useDispatch(); 
   const {status, errorMessage, user } = useSelector(state => state.auth) 
-  
+   
   const {email, password, onInputChange, formState}=useForm(loginFormFields) 
   
   //const isAuthenticating = useMemo(()=>status === 'checking', [status])
@@ -27,7 +27,7 @@ export const LoginPage = () => {
   const onSubmit=async (event)=>{ 
     event.preventDefault();
     dispatch(startLoginWithEmailPassword(formState))
-   } 
+  } 
 
   const onGoogleSignIn = () => { 
     dispatch(startGoogleSignIn()) //Función THUNKS 

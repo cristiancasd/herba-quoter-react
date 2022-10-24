@@ -10,7 +10,7 @@ export const NewEditView = () => {
     const handleChange = (event) => {
         console.log('hola mundo')
         //setAge(event.target.value);
-      };
+    };
 
   return (
 <>

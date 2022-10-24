@@ -11,7 +11,6 @@ export const startLoginWithEmailPassword = ({email, password}) => {
         try{
             //const resp=await quoterApi.post ('/auth/login',{email,password})           
             const {data} = await quoterApi.post('/auth/login',{email,password})
-            console.log(data)
             const {user}=data;
             localStorage.setItem('token',data.token);
             localStorage.setItem('token-init-date', new Date().getTime()); //Hacer manejos de token, calcular cuanto tiempo le queda etc.          
@@ -19,21 +18,44 @@ export const startLoginWithEmailPassword = ({email, password}) => {
             })); 
         
         }catch(error){
-            console.log(error);
             error.response.status==401
                 ? dispatch(onLogout('Invalid Credentials'))
                 : dispatch(onLogout(error.response.data.message[0]));
-            
-            console.log('disparo contador');
-
             setTimeout(()=>{
-                console.log('reseteo errores');
                 dispatch(clearErrorMessage());
             },10);
         }
     }       
 }
 
+export const startRegisterWithEmailPassword = (userNewData) => {
+
+    return async(dispatch) =>{
+        dispatch(checkingCredentials());
+        const userNewDataBackend={}
+        for (let clave in userNewData){
+            if(userNewData[clave]!=="" && clave!=='password2')
+            userNewDataBackend[clave]=userNewData[clave]             
+        }
+
+        try{
+            const {data} = await quoterApi.post('/auth/register',userNewDataBackend);
+            const {user, token}= data;
+            localStorage.setItem('token',token);
+            localStorage.setItem('token-init-date', new Date().getTime()); //Hacer manejos de token, calcular cuanto tiempo le queda etc.          
+            dispatch(onLogin({name: user.fullname, id: user.id, rol: user.rol, email: user.email, herbalifeLevel: user.herbalifelevel, country: user.country
+            })); 
+        }catch(error){   
+            console.log('error register ', error)     ;   
+            (error.response.data.message.length===1)
+                ? dispatch(onLogout(error.response.data.message[0]))
+                : dispatch(onLogout(`The email ${userNewDataBackend.email} already exists`));
+            setTimeout(()=>{
+                dispatch(clearErrorMessage());
+            },10);
+        }
+    }       
+}
 
 export const checkingAuthentication = (email,password) => { 
     return async (dispatch) => { 

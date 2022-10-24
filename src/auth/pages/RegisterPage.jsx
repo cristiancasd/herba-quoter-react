@@ -1,49 +1,96 @@
-import { Button, Grid, TextField, Typography, Link } from "@mui/material"
 import {Link as routerLink} from 'react-router-dom'
+import { Button, Grid, TextField, Typography, Link, Alert, InputLabel, Select, MenuItem } from "@mui/material"
+import { useEffect, useMemo, useState } from "react"
+import { useDispatch, useSelector } from "react-redux"
 import { useForm } from "../../hooks/useForm"
 import { AuthLayout } from '../layout/AuthLayout'
+import { startRegisterWithEmailPassword } from '../../store/auth/thunks'
+import Swal from 'sweetalert2'
 
-const registerFormFields={
-  fullName: '',
-  email: '',
-  herbalifeLevel:'',
-  rol:'',
-  country:'',
+const formData={
   password:'',
-  confirmPassword:'',
+  password2:'',
+  fullname: '',
+  email: '',
+  herbalifelevel:'cliente',
+  rol:'', 
+  country:'',
 }
+
+const formValidations={
+  email: [(value)=>value.includes('@'), 'El correo debe contener @' ],
+  password: [(value)=>value.length>=6,  'El password debe tener mínimo 6 letras, 1 número, 1 mayuscula, 1 minuscula' ],
+  password2: [(value)=>value===formData.password ,  'Las contraseñas no coinciden' ],
+  fullname: [(value)=>value.length>=3,  'El nombre es obligatorio' ],
+}
+
 
 export const RegisterPage = () => {
 
-  const {email, fullName, herbalifeLevel, rol, 
-    country,password, confirmPassword, 
-    onInputChange, formState}=useForm(registerFormFields) 
 
-  const onSubmit=async (event)=>{ 
+  const dispatch = useDispatch();
+
+  //Traigo los estados de las varaibles globales, /store/auth/authslices
+  const {status, errorMessage}    = useSelector(state=>state.auth);
+
+  //isCheckingAuthentication, sirve para desabilitar botón
+  const isCheckingAuthentication  = useMemo(()=>status==='checking',[status])
+
+  // Variable para saber si el formulario ya fue submitted
+  const [formSubmitted, setFormSubmitted] = useState(false)
+
+
+
+  const {password, password2,email, fullname, herbalifelevel, rol, 
+    country,onInputChange, formState,  
+    isFormValid, fullnameValid, emailValid, passwordValid, password2Valid,
+  }=useForm(formData,formValidations) 
+
+  const onSubmit=(event)=>{ 
+    console.log('estoy en submit');
     event.preventDefault();
-    console.log({registerEmail, registerPassword, registerConfirmPassword}) 
-    dispatch(checkingAuthentication())
-   } 
+    console.log(email,password, password2)
+    console.log('isFormValid', isFormValid)
+    setFormSubmitted(true); //Cambiamos estado
+    if(!isFormValid) return;
+      dispatch(startRegisterWithEmailPassword(formState))
+   }
+  
+   useEffect(()=>{
+    if(errorMessage!== undefined && errorMessage!== null){
+      console.log('errorMessage ', errorMessage)
+      Swal.fire('Error en la Autenticación', errorMessage, 'error')
+    }
+  },[errorMessage])
+
+  
+
 
   return (  
         <AuthLayout title='Crear cuenta'>       
-          <form onSubmit={onSubmit}>
+          <form 
+          className='animate__animated animate__fadeIn animate__faster'
+          onSubmit={onSubmit}>
             <Grid container>
               <Grid item xs={12} sx={{mt:2}}>
                 <TextField 
+                  required
                   label="Nombre completo"
                   type="text"
                   placeholder="Nombre completo"
                   fullWidth
-                  name="fullName"
-                  value={fullName}
+                  name="fullname"
+                  value={fullname}
                   onChange={onInputChange}
-                  required
+                  error={!!fullnameValid && formSubmitted /*Casilla roja por error*/}
+                  helperText={fullnameValid /*Texto error bajo la casilla*/}
+                  
                   />
               </Grid>
 
               <Grid item xs={12} sx={{mt:2}}>
                 <TextField 
+                  required
                   label="Correo"
                   type="email"
                   placeholder="email@google.com"
@@ -51,7 +98,8 @@ export const RegisterPage = () => {
                   name="email"
                   value={email}
                   onChange={onInputChange}
-                  required
+                  error={!!emailValid && formSubmitted}
+                  helperText={emailValid}
                   />
               </Grid>
               <Grid item xs={12} sx={{mt:2}}>
@@ -63,7 +111,6 @@ export const RegisterPage = () => {
                   name="rol"
                   value={rol}
                   onChange={onInputChange}
-                  required
                   />
               </Grid>
               <Grid item xs={12} sx={{mt:2}}>
@@ -75,21 +122,30 @@ export const RegisterPage = () => {
                   name="country"
                   value={country}
                   onChange={onInputChange}
-                  required
                   />
               </Grid>
+
               <Grid item xs={12} sx={{mt:2}}>
-                <TextField 
-                  label="Nivel Herbalife"
-                  type="text"
-                  placeholder="Nacionalidad"
-                  fullWidth
-                  name="herbalifeLevel"
-                  value={herbalifeLevel}
-                  onChange={onInputChange}
-                  required
-                  />
-              </Grid>
+                <InputLabel id="demo-simple-select-label">Nivel herbalife</InputLabel>
+                    <Select
+                        fullWidth
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        value={herbalifelevel}
+                        label="Herbalife Level"
+                        onChange={onInputChange}
+                        name="herbalifelevel"
+                        >
+                        <MenuItem value={'cliente'}>cliente</MenuItem>
+                        <MenuItem value={'cliente-15'}>Descuento 15%</MenuItem>
+                        <MenuItem value={'distribuidor-25'}>Descuento 25%</MenuItem>
+                        <MenuItem value={'distribuidor-35'}>Descuento 35%</MenuItem>
+                        <MenuItem value={'distribuidor-42'}>Descuento 42%</MenuItem>
+                        <MenuItem value={'supervisor'}>Supervisor</MenuItem>
+
+                    </Select>
+                </Grid>
+
               <Grid item xs={12} sx={{mt:2}}>
                 <TextField 
                   label="Contraseña"
@@ -99,6 +155,8 @@ export const RegisterPage = () => {
                   name="password"
                   value={password}
                   onChange={onInputChange}
+                  error={!!passwordValid  && formSubmitted}
+                  helperText={passwordValid}
                   required
                   />
               </Grid>
@@ -108,16 +166,29 @@ export const RegisterPage = () => {
                   type="password"
                   placeholder="confirmar password"
                   fullWidth
-                  name="confirmPassword"
-                  value={confirmPassword}
+                  name="password2"
+                  value={password2}
                   onChange={onInputChange}
+                  error={!!password2Valid  && formSubmitted}
+                  helperText={password2Valid}                  
                   required
                   />
               </Grid>
+
+              <Grid container spacing={2} sx={{mb:2, mt:1}}>              
+                <Grid item xs={12} 
+                  display={!!errorMessage  ? '' :'none'}
+                >
+                  <Alert severity='error'>{errorMessage} </Alert>
+                </Grid>               
+              </Grid> 
  
               <Grid container spacing={2} sx={{mb:2, mt:1}}>              
                 <Grid item xs={12} >
-                  <Button variant='contained' fullWidth>
+                  <Button type="submit" 
+                  disabled={isCheckingAuthentication}
+                  variant='contained' 
+                  fullWidth>
                       Crear Cuenta
                   </Button>
                 </Grid>               

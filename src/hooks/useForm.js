@@ -17,12 +17,20 @@ export const useForm = ( initialForm = {}, formValidations={} ) => {
         const formData=formState    //En RegisterPage enviamos la función con formData
         const formCheckedValues={}
         for(const formField of Object.keys(formValidations)){
+            
             const [fn,errorMessege]=formValidations[formField];
-             
-                formCheckedValues[`${formField}Valid`]=
-                fn(formState[formField])
-                    ? null
-                    : errorMessege;  
+                
+                if(formField!=='password2'){
+                    formCheckedValues[`${formField}Valid`]=                
+                    fn(formState[formField])
+                        ? null
+                        : errorMessege;  
+                }else{
+                    (formData['password']===formData['password2'])
+                        ? formCheckedValues['password2Valid']=  null
+                        : formCheckedValues['password2Valid']=errorMessege
+                                        
+                }
         }
         setFormValidation(formCheckedValues)
         //Usa las funciones y muestra el mensaje de error, ambos definidos en Register Page
