@@ -4,31 +4,53 @@ import { Button, Grid, Link, TextField, Typography } from "@mui/material"
 import {Google} from '@mui/icons-material'
 import { AuthLayout } from '../layout/AuthLayout'
 import { useForm } from '../../hooks/useForm'
-import { checkingAuthentication, startGoogleSignIn } from '../../store/auth/thunks'
-import { useMemo } from 'react'
+import { startGoogleSignIn, startLoginWithEmailPassword } from '../../store/auth/thunks'
+import { useEffect, useMemo } from 'react'
 
-const configVar={
-  email: 'algo@algo.com', password:'123456'
+import Swal from 'sweetalert2'
+
+const loginFormFields={
+  email: '',
+  password: '',
 }
+
 export const LoginPage = () => {
 
-
-  
   //Usar Redux 
   const dispatch = useDispatch(); 
-  //const {status} = useSelector(state => state.auth) 
-  const {email, password, onInputChange, formState}=useForm(configVar) 
+  const {status, errorMessage, user } = useSelector(state => state.auth) 
+  
+  const {email, password, onInputChange, formState}=useForm(loginFormFields) 
   
   //const isAuthenticating = useMemo(()=>status === 'checking', [status])
 
-  const onSubmit=(event)=>{ 
-    event.preventDefault(); 
-    dispatch(checkingAuthentication()) //Función THUNKS, la cambiaremos
+  const onSubmit=async (event)=>{ 
+    event.preventDefault();
+    dispatch(startLoginWithEmailPassword(formState))
    } 
 
   const onGoogleSignIn = () => { 
     dispatch(startGoogleSignIn()) //Función THUNKS 
   }
+
+  useEffect(()=>{
+    if(errorMessage!== undefined && errorMessage!== null){
+      console.log('errorMessage ', errorMessage)
+      Swal.fire('Error en la Autenticación', errorMessage, 'error')
+    }
+  },[errorMessage])
+
+  useEffect(()=>{
+    if(user.name!==undefined && user.name!==null){
+      Swal.fire({
+        icon: 'success',
+        title:  `${user.email} Loggin`,
+        showConfirmButton: false,
+        timer: 1500
+      })
+    } 
+  },[user]) 
+  
 
 
   return (
@@ -47,14 +69,24 @@ export const LoginPage = () => {
                   label="Correo"
                   type="email"
                   placeholder="email@google.com"
-                  fullWidth/>
+                  fullWidth
+                  name="email"
+                  value={email}
+                  onChange={onInputChange}
+                  required
+                  />
               </Grid>
               <Grid item xs={12} sx={{mt:2}}>
                 <TextField 
                   label="Contraseña"
                   type="password"
                   placeholder="Password"
-                  fullWidth/>
+                  name="password"
+                  value={password}
+                  onChange={onInputChange}
+                  fullWidth
+                  required
+                  />
               </Grid>
  
               
