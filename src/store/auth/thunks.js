@@ -1,6 +1,7 @@
 //import { quoterApi } from "../../api/quoterApi";
 import {quoterApi} from "../../api";
 import { getEnvVariables } from "../../helpers/getEnvVariables";
+import { startLoadingCategories, startLoadingProducts } from "../quoter/thunks";
 import { checkingCredentials, clearErrorMessage, onLogin, onLogout } from "./authSlice";
 
 export const startLoginWithEmailPassword = ({email, password}) => {
@@ -14,6 +15,9 @@ export const startLoginWithEmailPassword = ({email, password}) => {
             const {user}=data;
             localStorage.setItem('token',data.token);
             localStorage.setItem('token-init-date', new Date().getTime()); //Hacer manejos de token, calcular cuanto tiempo le queda etc.          
+            //startLoadingCategories();
+            //startLoadingProducts();
+            
             dispatch(onLogin({name: user.fullname, id: user.id, rol: user.rol, email: email, herbalifeLevel: user.herbalifelevel, country: user.country
             })); 
         
@@ -70,7 +74,7 @@ export const startGoogleSignIn = () => {
 }
 
 export const chekAuthToken = () => {
-    return async (dispatch) => {
+    return async (dispatch) => { 
         dispatch(checkingCredentials());
         const token=localStorage.getItem('token');
         if(!token)  dispatch(onLogout());

@@ -1,10 +1,46 @@
 import { TurnedInNot } from "@mui/icons-material"
 import { Divider, Drawer, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography } from "@mui/material"
 import { Box } from "@mui/system"
-import { useSelector } from "react-redux"
+import { useEffect } from "react"
+import { useDispatch, useSelector } from "react-redux"
+import { setActiveProduct } from "../../store/quoter/quoterSlice"
+import { startLoadingCategories, startLoadingProducts } from "../../store/quoter/thunks"
+import { SideBarItemCategories } from "./SideBarItemCategories"
+import { SideBarItemProducts } from "./sideBarItemProducts"
 
 export const SideBar = ({drawerWidth= 240}) => {
+    
+    const dispatch = useDispatch();
     const {status, errorMessage, user } = useSelector(state => state.auth) 
+    const {products, categories, productsLoaded, categoriesLoaded } = useSelector(state => state.quoter) 
+
+    useEffect(()=>{
+        dispatch(startLoadingCategories())
+        dispatch(startLoadingProducts())        
+    },[]);
+
+    if(productsLoaded!=='ok'|| categoriesLoaded!=='ok'){
+        return(
+          <h3>Cargando...</h3>
+        )
+      }
+
+    const onClickNote =()=>{
+        //dispatch(setActiveNote({title,body,id,date,imageURL}));  
+    }
+    let toShow=[];
+
+    categories.map( category => {
+        toShow.push(<SideBarItemCategories key={category.id}{ ...category}/>);
+        products.map(product=>{
+            
+            if(product.category.id===category.id){
+                toShow.push(<SideBarItemProducts key={product.id}{ ...product }/>);
+            }
+            return           
+        })
+        return
+    });
 
   return (
     <Box
@@ -20,31 +56,24 @@ export const SideBar = ({drawerWidth= 240}) => {
             <Toolbar>
                 <Typography variant='h6' noWrap component='div'>
                     {user.name}
-                </Typography>
-            
+                </Typography>            
             <Divider/>
-            </Toolbar>
+            </Toolbar>          
+
+
+
+           
+            <List> 
+
             
-            <Toolbar>
-            <Typography variant='h7' noWrap component='div'>
-                    Proteínas
-            </Typography>
-            </Toolbar>
-            
-            <List>
-                {
-                    ['Proteína personalizada','PDM','Beverage Mix','Rebuild Strength'].map( text => (
-                        <ListItem key={ text } disablePadding>
-                            <ListItemButton>
-                                <ListItemIcon>
-                                    <TurnedInNot />
-                                </ListItemIcon>
-                                <Grid container>
-                                    <ListItemText primary={ text } />
-                                </Grid>
-                            </ListItemButton>
-                        </ListItem>
-                    ))
+                
+                {toShow}
+                   
+                { /*            
+                    
+                    categories.map( category =>   {                    
+                        return <SideBarItemProducts key={category.id}{...category}/>                    
+                    })    */              
                 }
             </List>
        </Drawer>

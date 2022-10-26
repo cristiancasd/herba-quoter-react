@@ -1,15 +1,26 @@
 
 import { AddOutlined } from "@mui/icons-material"
 import { IconButton, Typography } from "@mui/material"
+import { useDispatch, useSelector } from "react-redux"
 import { QuoterLayout } from "../layout/QuoterLayout"
 import { NewEditView } from "../views/NewEditView"
 import { NothingSelectedView } from "../views/NothingSelectedView"
 
 export const QuoterPage = () => {
 
+  const dispatch=useDispatch();
+  const {isSaving, activeQuoter, activeProduct}= useSelector(state=>state.quoter)
+
+
   return (
-    <QuoterLayout>      
-      <NewEditView/> 
+    <QuoterLayout>     
+
+      {
+        activeProduct
+          ? <NewEditView />
+          : <NothingSelectedView/>
+      } 
+      
       <IconButton
         size='large'
         sx={{

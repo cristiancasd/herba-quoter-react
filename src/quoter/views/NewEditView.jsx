@@ -1,16 +1,38 @@
-import { SaveOutlined, } from "@mui/icons-material"
+import { SaveOutlined, SignalCellularNull, } from "@mui/icons-material"
 import { Grid, Select, TextField, Typography, MenuItem, InputLabel } from "@mui/material"
 import { ImageGallery } from "../components/imageGallery"
 
 import Box from '@mui/material/Box';
+import { useSelector } from "react-redux";
+import { useForm } from "../../hooks/useForm";
 
 export const NewEditView = () => {
     
-    let category='proteína';
+    const{activeProduct, productsLoaded, categoriesLoaded, categories}= useSelector(state=> state.quoter)
+    
+    if(productsLoaded!=='ok'|| categoriesLoaded!=='ok'){
+        return(
+          <h3>Cargando...</h3>
+        )
+    }
+
+
+    const productForm={
+        ...activeProduct,
+        category: activeProduct.category.title,
+        user: activeProduct.user.fullname,
+    }
+
+    const {title, description, pv,sku, image,
+    pricepublic, price15, price25,
+    price35, price42, price50, category} =useForm (productForm)
+
     const handleChange = (event) => {
         console.log('hola mundo')
         //setAge(event.target.value);
     };
+
+
 
   return (
 <>
@@ -24,10 +46,8 @@ export const NewEditView = () => {
                 <SaveOutlined sx={{fontSize: 30, mr:1}}/>
                 Guardar
             </button>
-        </Grid>
-    
+        </Grid>    
     </Grid>
-
 
     <Grid container  spacing={2}  alignItems='center'>
         <Grid item xs={12}  md={3}>
@@ -39,7 +59,7 @@ export const NewEditView = () => {
                 type='text'
                 variant='filled'
                 fullWidth
-                
+                value={title}
                 placeholder="Ingrese Titulo"
                 label='Titulo'
                 sx={{border:'none', mb:1}}
@@ -48,6 +68,7 @@ export const NewEditView = () => {
                 type='text'
                 variant='filled'
                 fullWidth
+                value={description}
                 label='Descripción'
                 multiline
                 placeholder="Descripción"
@@ -65,7 +86,8 @@ export const NewEditView = () => {
                     <TextField
                     type='text'
                     variant='filled'
-                    fullWidth                
+                    fullWidth   
+                    value={pricepublic}             
                     placeholder="Precio Público"
                     label='Precio Público'
                     sx={{border:'none', mb:1}}
@@ -76,7 +98,8 @@ export const NewEditView = () => {
                     <TextField
                     type='text'
                     variant='filled'
-                    fullWidth                
+                    fullWidth 
+                    value={price15}                
                     placeholder="Precio 15%"
                     label='Precio 15%'
                     sx={{border:'none', mb:1}}
@@ -87,7 +110,8 @@ export const NewEditView = () => {
                     <TextField
                         type='text'
                         variant='filled'
-                        fullWidth                
+                        fullWidth 
+                        value={price25}                
                         placeholder="Precio 25%"
                         label='Precio 25%'
                         sx={{border:'none', mb:1}}
@@ -98,7 +122,8 @@ export const NewEditView = () => {
                     <TextField
                         type='text'
                         variant='filled'
-                        fullWidth                
+                        fullWidth   
+                        value={price35}              
                         placeholder="Precio 35%"
                         label='Precio 35%'
                         sx={{border:'none', mb:1}}
@@ -109,7 +134,8 @@ export const NewEditView = () => {
                     <TextField
                         type='text'
                         variant='filled'
-                        fullWidth                
+                        fullWidth    
+                        value={price42}             
                         placeholder="Precio 42%"
                         label='Precio 42%'
                         sx={{border:'none', mb:1}}
@@ -120,7 +146,8 @@ export const NewEditView = () => {
                     <TextField
                         type='text'
                         variant='filled'
-                        fullWidth                
+                        fullWidth   
+                        value={price50}              
                         placeholder="Precio 50%"
                         label='Precio 50%'
                         sx={{border:'none', mb:1}}
@@ -130,7 +157,8 @@ export const NewEditView = () => {
                     <TextField
                         type='text'
                         variant='filled'
-                        fullWidth                
+                        fullWidth   
+                        value={pv}              
                         placeholder="PV"
                         label='PV'
                         sx={{border:'none', mb:1}}
@@ -140,7 +168,8 @@ export const NewEditView = () => {
                     <TextField
                         type='text'
                         variant='filled'
-                        fullWidth                
+                        fullWidth     
+                        value={sku}            
                         placeholder="SKU"
                         label='SKU'
                         sx={{border:'none', mb:1}}
@@ -153,12 +182,13 @@ export const NewEditView = () => {
                         fullWidth
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
-                        value={category}
+                        value={activeProduct.category.id}
                         label="Categoría"
                         onChange={handleChange}
                         >
-                        <MenuItem value={'proteína'}>Proteína</MenuItem>
-                        <MenuItem value={'salud digestiva'}>salud digestiva</MenuItem>
+                        {categories.map( category => (
+                            <MenuItem value={category.id}>{category.title}</MenuItem>
+                        ))}                        
                     </Select>
                 </Grid>
 

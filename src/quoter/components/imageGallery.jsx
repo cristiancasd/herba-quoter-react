@@ -1,7 +1,20 @@
 import ImageList from '@mui/material/ImageList';
 import ImageListItem from '@mui/material/ImageListItem';
+import { useSelector } from 'react-redux';
 
 export const ImageGallery=()=> {
+
+  const{activeProduct}= useSelector(state=> state.quoter)
+
+  const itemData = [
+    {
+      img: activeProduct.image,
+      title: activeProduct.title,
+    },
+    
+    //… más imagenes  
+  ];
+
   return (
     //<ImageList sx={{ width: '100%', height: 300 }} cols={1} rowHeight={164}>
     <ImageList sx={{ maxWidth: 300, }} cols={1} >
@@ -19,12 +32,5 @@ export const ImageGallery=()=> {
   );
 };
 
-const itemData = [
-  {
-    img: 'https://images.unsplash.com/photo-1551963831-b3b1ca40c98e',
-    title: 'Breakfast',
-  },
-  
-  //… más imagenes  
-];
+
 
