@@ -1,9 +1,7 @@
-import { TurnedInNot } from "@mui/icons-material"
 import { Divider, Drawer, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography } from "@mui/material"
 import { Box } from "@mui/system"
 import { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { setActiveProduct } from "../../store/quoter/quoterSlice"
 import { startLoadingCategories, startLoadingProducts } from "../../store/quoter/thunks"
 import { SideBarItemCategories } from "./SideBarItemCategories"
 import { SideBarItemProducts } from "./sideBarItemProducts"
@@ -11,7 +9,7 @@ import { SideBarItemProducts } from "./sideBarItemProducts"
 export const SideBar = ({drawerWidth= 240}) => {
     
     const dispatch = useDispatch();
-    const {status, errorMessage, user } = useSelector(state => state.auth) 
+    const {user} = useSelector(state => state.auth) 
     const {products, categories, productsLoaded, categoriesLoaded } = useSelector(state => state.quoter) 
 
     useEffect(()=>{
@@ -23,17 +21,12 @@ export const SideBar = ({drawerWidth= 240}) => {
         return(
           <h3>Cargando...</h3>
         )
-      }
-
-    const onClickNote =()=>{
-        //dispatch(setActiveNote({title,body,id,date,imageURL}));  
     }
-    let toShow=[];
 
+    let toShow=[];
     categories.map( category => {
         toShow.push(<SideBarItemCategories key={category.id}{ ...category}/>);
         products.map(product=>{
-            
             if(product.category.id===category.id){
                 toShow.push(<SideBarItemProducts key={product.id}{ ...product }/>);
             }
@@ -59,22 +52,8 @@ export const SideBar = ({drawerWidth= 240}) => {
                 </Typography>            
             <Divider/>
             </Toolbar>          
-
-
-
-           
             <List> 
-
-            
-                
                 {toShow}
-                   
-                { /*            
-                    
-                    categories.map( category =>   {                    
-                        return <SideBarItemProducts key={category.id}{...category}/>                    
-                    })    */              
-                }
             </List>
        </Drawer>
     </Box>

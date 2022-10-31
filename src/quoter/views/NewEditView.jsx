@@ -3,35 +3,44 @@ import { Grid, Select, TextField, Typography, MenuItem, InputLabel } from "@mui/
 import { ImageGallery } from "../components/imageGallery"
 
 import Box from '@mui/material/Box';
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "../../hooks/useForm";
+import { useEffect } from "react";
+import { startCreateProduct, startUpdateProduct } from "../../store/quoter/thunks";
+import Swal from 'sweetalert2'
+import { setIsSaving } from "../../store/quoter/quoterSlice";
 
 export const NewEditView = () => {
     
-    const{activeProduct, productsLoaded, categoriesLoaded, categories}= useSelector(state=> state.quoter)
-    
-    if(productsLoaded!=='ok'|| categoriesLoaded!=='ok'){
-        return(
-          <h3>Cargando...</h3>
-        )
-    }
+    const{errorMessage, categories, activeProductToEdit, activeProduct,
+        statusQuoter, quoterProcess, }= useSelector(state=> state.quoter)
 
-
-    const productForm={
-        ...activeProduct,
-        category: activeProduct.category.title,
-        user: activeProduct.user.fullname,
-    }
 
     const {title, description, pv,sku, image,
-    pricepublic, price15, price25,
-    price35, price42, price50, category} =useForm (productForm)
+    pricepublic, price15, price25, categoryId,
+    price35, price42, price50,  formState, onInputChange, onResetForm} =useForm(activeProductToEdit)
 
-    const handleChange = (event) => {
-        console.log('hola mundo')
-        //setAge(event.target.value);
-    };
+    
+    
+    const dispatch=useDispatch();
 
+    const onClickSaveProduct = () =>{
+        dispatch(setIsSaving(true));
+        quoterProcess==='edit'
+            ? dispatch(startUpdateProduct(formState, activeProduct.category))        
+            : dispatch(startCreateProduct(formState));
+    }
+
+    useEffect(()=>{
+        console.log('errorMessage en useEffect ',errorMessage)
+        if(errorMessage!== undefined && errorMessage!== null){
+          Swal.fire('Ocurrió un error', errorMessage, 'error')
+        }
+      },[errorMessage])
+        
+    useEffect(()=>{
+        onResetForm()
+      },[quoterProcess])
 
 
   return (
@@ -42,7 +51,10 @@ export const NewEditView = () => {
             <Typography fontSize={39} fontWeight='light'> texto x</Typography>
         </Grid>
         <Grid item>
-            <button color='primary' sx={{padding:2}}>
+            <button 
+            disabled={statusQuoter=='communicating'}
+            onClick={onClickSaveProduct}
+            color='primary' sx={{padding:2}}>
                 <SaveOutlined sx={{fontSize: 30, mr:1}}/>
                 Guardar
             </button>
@@ -59,15 +71,20 @@ export const NewEditView = () => {
                 type='text'
                 variant='filled'
                 fullWidth
+                name="title"
                 value={title}
+                onChange={onInputChange}
                 placeholder="Ingrese Titulo"
-                label='Titulo'
+                label='Titulo'              
+                
                 sx={{border:'none', mb:1}}
             />
             <TextField
                 type='text'
                 variant='filled'
                 fullWidth
+                name="description"
+                onChange={onInputChange}
                 value={description}
                 label='Descripción'
                 multiline
@@ -84,7 +101,9 @@ export const NewEditView = () => {
             <Grid container  spacing={2}>
                 <Grid item xs={12}  md={6}>
                     <TextField
-                    type='text'
+                    name="pricepublic"
+                    onChange={onInputChange}
+                    type='number'
                     variant='filled'
                     fullWidth   
                     value={pricepublic}             
@@ -96,9 +115,11 @@ export const NewEditView = () => {
 
                 <Grid item xs={12}  md={6}>
                     <TextField
-                    type='text'
+                    type='number'
                     variant='filled'
                     fullWidth 
+                    name="price15"
+                    onChange={onInputChange}
                     value={price15}                
                     placeholder="Precio 15%"
                     label='Precio 15%'
@@ -108,9 +129,11 @@ export const NewEditView = () => {
 
                 <Grid item xs={12}  md={6}>
                     <TextField
-                        type='text'
+                        type='number'
                         variant='filled'
                         fullWidth 
+                        name="price25"
+                        onChange={onInputChange}
                         value={price25}                
                         placeholder="Precio 25%"
                         label='Precio 25%'
@@ -120,9 +143,11 @@ export const NewEditView = () => {
 
                 <Grid item xs={12}  md={6}>
                     <TextField
-                        type='text'
+                        type='number'
                         variant='filled'
                         fullWidth   
+                        name="price35"
+                        onChange={onInputChange}
                         value={price35}              
                         placeholder="Precio 35%"
                         label='Precio 35%'
@@ -132,9 +157,11 @@ export const NewEditView = () => {
 
                 <Grid item xs={12}  md={6}>
                     <TextField
-                        type='text'
+                        type='number'
                         variant='filled'
-                        fullWidth    
+                        fullWidth   
+                        name="price42"
+                        onChange={onInputChange} 
                         value={price42}             
                         placeholder="Precio 42%"
                         label='Precio 42%'
@@ -144,9 +171,11 @@ export const NewEditView = () => {
 
                 <Grid item xs={12}  md={6}>
                     <TextField
-                        type='text'
+                        type='number'
                         variant='filled'
                         fullWidth   
+                        name="price50"
+                        onChange={onInputChange}
                         value={price50}              
                         placeholder="Precio 50%"
                         label='Precio 50%'
@@ -155,9 +184,12 @@ export const NewEditView = () => {
                 </Grid>
                 <Grid item xs={12}  md={6}>
                     <TextField
-                        type='text'
+                        type='number'
+                        step='2'
                         variant='filled'
-                        fullWidth   
+                        fullWidth  
+                        name="pv"
+                        onChange={onInputChange} 
                         value={pv}              
                         placeholder="PV"
                         label='PV'
@@ -168,7 +200,9 @@ export const NewEditView = () => {
                     <TextField
                         type='text'
                         variant='filled'
-                        fullWidth     
+                        fullWidth   
+                        name="sku"
+                        onChange={onInputChange}  
                         value={sku}            
                         placeholder="SKU"
                         label='SKU'
@@ -176,22 +210,25 @@ export const NewEditView = () => {
                         />
                 </Grid>
 
+
                 <Grid item xs={12}>
                 <InputLabel id="demo-simple-select-label">Categoría</InputLabel>
                     <Select
                         fullWidth
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
-                        value={activeProduct.category.id}
-                        label="Categoría"
-                        onChange={handleChange}
+                        name='categoryId'                        
+                        label="Categoría"                        
+                        onChange={onInputChange}
+                        value={categoryId}
                         >
                         {categories.map( category => (
-                            <MenuItem value={category.id}>{category.title}</MenuItem>
-                        ))}                        
+                            <MenuItem 
+                            key={category.id}
+                            value={category.id}>{category.title}</MenuItem>
+                        ))}                     
                     </Select>
                 </Grid>
-
             </Grid>
     </Box>
     

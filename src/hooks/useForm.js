@@ -14,7 +14,7 @@ export const useForm = ( initialForm = {}, formValidations={} ) => {
     }, [initialForm])
 
     const createValidators = () =>{
-        const formData=formState    //En RegisterPage enviamos la función con formData
+        const formData=formState    
         const formCheckedValues={}
         for(const formField of Object.keys(formValidations)){
             

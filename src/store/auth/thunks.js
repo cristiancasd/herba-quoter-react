@@ -48,9 +48,9 @@ export const startRegisterWithEmailPassword = (userNewData) => {
             localStorage.setItem('token',token);
             localStorage.setItem('token-init-date', new Date().getTime()); //Hacer manejos de token, calcular cuanto tiempo le queda etc.          
             dispatch(onLogin({name: user.fullname, id: user.id, rol: user.rol, email: user.email, herbalifeLevel: user.herbalifelevel, country: user.country
-            })); 
-        }catch(error){   
-            console.log('error register ', error)     ;   
+            }));
+        }catch(error){
+            console.log('error register ', error);   
             (error.response.data.message.length===1)
                 ? dispatch(onLogout(error.response.data.message[0]))
                 : dispatch(onLogout(`The email ${userNewDataBackend.email} already exists`));

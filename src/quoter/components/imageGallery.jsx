@@ -4,12 +4,12 @@ import { useSelector } from 'react-redux';
 
 export const ImageGallery=()=> {
 
-  const{activeProduct}= useSelector(state=> state.quoter)
+  const{activeProductToEdit}= useSelector(state=> state.quoter)
 
   const itemData = [
     {
-      img: activeProduct.image,
-      title: activeProduct.title,
+      img: activeProductToEdit.image,
+      title: activeProductToEdit.title,
     },
     
     //… más imagenes  

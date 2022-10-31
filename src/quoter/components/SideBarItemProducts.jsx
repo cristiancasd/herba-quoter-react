@@ -2,13 +2,12 @@ import { TurnedInNot , Stars, StartSharp} from '@mui/icons-material'
 import { Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar,  } from '@mui/material'
 import React, { useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux/es/exports'
-import { setActiveProduct } from '../../store/quoter/quoterSlice'
+import { setActiveProduct, setActiveProductToEdit} from '../../store/quoter/quoterSlice'
 
 
 export const SideBarItemProducts = (product) => {
 
- // const {products, categories } = useSelector(state => state.quoter) 
-  const {title, description}=product
+  const {title, description}=product;
   const dispatch = useDispatch();
   
   const newTitle = useMemo(() => {
@@ -25,10 +24,11 @@ export const SideBarItemProducts = (product) => {
 
 
 
-  //setActiveNote({title,body,id,date})
   const onClickNote =()=>{
-      //dispatch(setActiveNote({title,body,id,date,imageURL}));  
       dispatch(setActiveProduct(product))
+      const {user, category, isactive, ...resto}=product;
+      const productToEdit={ ...resto, categoryId: product.category.id}
+      dispatch(setActiveProductToEdit(productToEdit))
     }
 
   return (    
@@ -44,10 +44,5 @@ export const SideBarItemProducts = (product) => {
               </Grid>
         </ListItemButton>
       </ListItem>
-
-
-      
-        
-    
   )
 }

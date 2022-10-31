@@ -1,15 +1,11 @@
 import { TurnedInNot } from '@mui/icons-material'
 import { Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar,  } from '@mui/material'
 import React, { useMemo } from 'react'
-import { useDispatch, useSelector } from 'react-redux/es/exports'
+import { setActiveCategory } from '../../store/quoter/quoterSlice';
 
 
-export const SideBarItemCategories = ({title,description,id}) => {
-
- // const {products, categories } = useSelector(state => state.quoter) 
-
-  const dispatch = useDispatch();
-  
+export const SideBarItemCategories = (category) => {
+  const {title, id, description}=category;
   const newTitle = useMemo(() => {
     return title.length>15 
                 ? title.substring(0,15)+'...'
@@ -22,11 +18,8 @@ export const SideBarItemCategories = ({title,description,id}) => {
                 : description;
   }, [description])
 
-
-
-  //setActiveNote({title,body,id,date})
   const onClickNote =()=>{
-      //dispatch(setActiveNote({title,body,id,date,imageURL}));  
+    dispatch(setActiveCategory(category))  
   }
 
   return (    
@@ -35,14 +28,8 @@ export const SideBarItemCategories = ({title,description,id}) => {
         <ListItemButton onClick={onClickNote}>
               <Grid container>
                   <ListItemText primary={ newTitle } />
-                  {/*<ListItemText secondary={ newBody } />*/}
               </Grid>
         </ListItemButton>
-      </ListItem>
-
-
-      
-        
-    
+      </ListItem> 
   )
 }
