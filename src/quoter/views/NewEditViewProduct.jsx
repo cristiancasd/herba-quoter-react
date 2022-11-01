@@ -10,7 +10,7 @@ import { startCreateProduct, startUpdateProduct } from "../../store/quoter/thunk
 import Swal from 'sweetalert2'
 import { setIsSaving } from "../../store/quoter/quoterSlice";
 
-export const NewEditView = () => {
+export const NewEditViewProduct = () => {
     
     const{errorMessage, categories, activeProductToEdit, activeProduct,
         statusQuoter, quoterProcess, }= useSelector(state=> state.quoter)
@@ -48,7 +48,7 @@ export const NewEditView = () => {
 <Box sx={{ flexGrow: 1 }}>
     <Grid container direction='row' justifyContent='space-between' alignItems='center' sx={{mb:1}} item xs={12}  md={12}>
         <Grid item>
-            <Typography fontSize={39} fontWeight='light'> texto x</Typography>
+            <Typography fontSize={39} fontWeight='light'> {quoterProcess} Product</Typography>
         </Grid>
         <Grid item>
             <button 

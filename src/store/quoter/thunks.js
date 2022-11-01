@@ -1,8 +1,12 @@
 import { quoterApi } from "../../api";
 import { adapteVariablesToNumber } from "../../helpers/adapteVariablesToNumber";
-import { communicatingBackend, setActiveProduct, 
-    setActiveProductToEdit, clearErrorMessage,
-    setCategories, setProducts, onErrorMessage, onUpdateProduct, onAddNewProduct, setIsSaving, setQuoterProcess} from "./quoterSlice";
+import { communicatingBackend, setActiveProductToEdit,
+    setActiveProduct, onUpdateProduct,setProducts,onAddNewProduct,
+    setActiveCategory, onUpdateCategory,setCategories,onAddNewCategory,
+    
+    clearErrorMessage,
+      onErrorMessage, 
+      setIsSaving, setQuoterProcess} from "./quoterSlice";
 
 
 export const startLoadingProducts=()=>{
@@ -125,5 +129,44 @@ export const startCreateProduct=(product)=>{
         }
     }
 }
+
+export const startCreateCategory=(category)=>{}
+
+export const startUpdateCategory=(category)=>{
+    return async(dispatch) =>{
+        dispatch(communicatingBackend())
+        try{
+            const {id, isactive, user, ...categoryToUpdate}=category;
+            console.log('voy a actualizar ',categoryToUpdate)
+            const {data} = await quoterApi.patch('/categories/'+id, categoryToUpdate);
+            console.log('categoria actualizada ...',data )
+            dispatch(setActiveCategory(data))
+            dispatch(onUpdateCategory(data));
+            dispatch(setIsSaving(false));        
+
+        }catch(error){
+            console.log('error es ', error)
+            if(error.response.status==403)
+                dispatch(onErrorMessage(`no tienes los permisos para hacer esta función`))
+
+            if(error.response.status==404)
+                dispatch(onErrorMessage(`Categoría con id ${category.id} no existe en la base de datos`))
+
+            if(error.response.status==410)
+                dispatch(onErrorMessage(`Categoría con id ${category.id} fue eliminado, hablar con el admin para reestablecerlo`))
+
+            if(error.response.status==400){
+                dispatch(onErrorMessage(error.response.data.message.toString()))
+                
+            }
+
+        dispatch(setIsSaving(false));
+        setTimeout(()=>{
+            dispatch(clearErrorMessage());
+        },10);
+        }
+    }
+}
+
 
 

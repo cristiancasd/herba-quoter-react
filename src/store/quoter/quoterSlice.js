@@ -138,12 +138,12 @@ export const quoterSlice = createSlice({
             state.activeCategory = null;
             state.selection='category'
         },
-        onUpdateCategroy: ( state, { payload } ) => {
+        onUpdateCategory: ( state, { payload } ) => {
             state.statusQuoter='ok';
             state.productsLoaded='ok';
             state.categoriesLoaded='ok';
             state.selection='category'
-            state.category = state.category.map( category => {
+            state.categories = state.categories.map( category => {
                 if ( category.id === payload.id ) {
                     return payload;
                 }
@@ -219,6 +219,8 @@ export const {
     onErrorMessage,
     setQuoterProcess,
     onUpdateProduct,
+    onUpdateCategory,
     onAddNewProduct,
+    onAddNewCategory,
     setIsSaving
  } = quoterSlice.actions

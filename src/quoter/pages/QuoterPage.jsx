@@ -4,7 +4,8 @@ import { IconButton, Typography } from "@mui/material"
 import { useDispatch, useSelector } from "react-redux"
 import { setQuoterProcess, setActiveProductToEdit } from "../../store/quoter/quoterSlice"
 import { QuoterLayout } from "../layout/QuoterLayout"
-import { NewEditView } from "../views/NewEditView"
+import { NewEditViewCategory } from "../views/NewEditViewCategory"
+import { NewEditViewProduct } from "../views/NewEditViewProduct"
 import { NothingSelectedView } from "../views/NothingSelectedView"
 
 export const QuoterPage = () => {
@@ -27,7 +28,7 @@ export const QuoterPage = () => {
       image:'',
       description: '',
       categoryId: activeProduct.category.id
-  };
+    };
     dispatch(setQuoterProcess('create'));
     dispatch(setActiveProductToEdit(productReset));
   }
@@ -36,7 +37,9 @@ export const QuoterPage = () => {
     <QuoterLayout>     
       {
         (productsLoaded && categoriesLoaded)
-          ? <NewEditView />
+          ? (activeProduct
+              ?<NewEditViewProduct />
+              :<NewEditViewCategory/>)
           : <NothingSelectedView />
       } 
       
