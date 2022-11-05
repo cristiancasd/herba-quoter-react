@@ -18,13 +18,15 @@ export const startLoginWithEmailPassword = ({email, password}) => {
             //startLoadingCategories();
             //startLoadingProducts();
             
-            dispatch(onLogin({name: user.fullname, id: user.id, rol: user.rol, email: email, herbalifeLevel: user.herbalifelevel, country: user.country
+            dispatch(onLogin({name: user.fullname, id: user.id, rol: user.rol, email: email,
+                herbalifeLevel: user.herbalifelevel, country: user.country, image: user.image
             })); 
         
         }catch(error){
+            console.log('error en autenticación login usuario y contraseña', error)
             error.response.status==401
                 ? dispatch(onLogout('Invalid Credentials'))
-                : dispatch(onLogout(error.response.data.message[0]));
+                : dispatch(onLogout(error.response.data.message.toString()));
             setTimeout(()=>{
                 dispatch(clearErrorMessage());
             },10);

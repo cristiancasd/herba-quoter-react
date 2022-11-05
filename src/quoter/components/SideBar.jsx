@@ -1,18 +1,21 @@
-import { Divider, Drawer, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography } from "@mui/material"
+import { DirectionsRailwayFilledSharp, MenuOutlined } from "@mui/icons-material"
+import { Divider, Drawer, Grid, IconButton, List, ListItem, 
+    ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography } from "@mui/material"
 import { Box } from "@mui/system"
-import { useEffect } from "react"
+import { useEffect, useMemo, } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { startLoadingCategories, startLoadingProducts } from "../../store/quoter/thunks"
+import { startLoadingCategories, startLoadingProducts, } from "../../store/quoter/thunks"
 import { SideBarItemCategories } from "./SideBarItemCategories"
 import { SideBarItemProducts } from "./sideBarItemProducts"
+import { DrawerScreenSize } from "./DrawerScreenSize"    
 
 export const SideBar = ({drawerWidth= 240}) => {
     
     const dispatch = useDispatch();
     const {user} = useSelector(state => state.auth) 
-    const {products, categories, productsLoaded, categoriesLoaded } = useSelector(state => state.quoter) 
+    const { products, categories, productsLoaded, categoriesLoaded, } = useSelector(state => state.quoter) 
 
-    useEffect(()=>{
+    useEffect(()=>{ 
         dispatch(startLoadingCategories())
         dispatch(startLoadingProducts())        
     },[]);
@@ -23,39 +26,29 @@ export const SideBar = ({drawerWidth= 240}) => {
         )
     }
 
-    let toShow=[];
-    categories.map( category => {
-        toShow.push(<SideBarItemCategories key={category.id}{ ...category}/>);
-        products.map(product=>{
-            if(product.category.id===category.id){
-                toShow.push(<SideBarItemProducts key={product.id}{ ...product }/>);
-            }
-            return           
-        })
-        return
-    });
 
+
+     
+    const variablesDrawer={
+        userName: user.name,
+        //menuProductosCategorias: toShow,
+        drawerWidth
+    }
+
+    console.log('vamos a renderizar')
+      
   return (
     <Box
         component='nav'
         sx={{width: {sm: drawerWidth}, flexShrink:{sm:0}}}>
-       <Drawer
-            variant='permanent'
-            open
-            sx={{
-                display:{xs:'block'},
-                '& .MuiDrawer-paper': {boxSizing: 'border-box', width: drawerWidth}
-            }}>
-            <Toolbar>
-                <Typography variant='h6' noWrap component='div'>
-                    {user.name}
-                </Typography>            
-            <Divider/>
-            </Toolbar>          
-            <List> 
-                {toShow}
-            </List>
-       </Drawer>
+       {
+        <DrawerScreenSize key={'123'}{ ...variablesDrawer }/>
+       }
     </Box>
   )
+
+  
+
 }
+
+

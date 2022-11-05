@@ -26,7 +26,7 @@ export const startLoadingProducts=()=>{
                 dispatch(onErrorMessage('No hay productos en la base de datos'));
 
             if(error.response.status==400)
-                dispatch(onErrorMessage(error.response.data.message.toString))
+                dispatch(onErrorMessage(error.response.data.message.toString()))
 
         setTimeout(()=>{
             dispatch(clearErrorMessage());
@@ -44,9 +44,7 @@ export const startLoadingCategories=()=>{
             dispatch(setCategories(data))
         }catch(error){
             console.log('error es ', error);
-            (error.response.data.message.length===1)
-                ? dispatch(onErrorMessage(error.response.data.message[0]))
-                : dispatch(onErrorMessage(error.response.data.message))
+            dispatch(onErrorMessage(error.response.data.message.toString()))
 
         setTimeout(()=>{
             dispatch(clearErrorMessage());
@@ -113,13 +111,13 @@ export const startCreateProduct=(product)=>{
             dispatch(setIsSaving(false));   
             //dispatch(setActiveProduct(data))
         }catch(error){
-            console.log('error es ', error)
+            console.log('error en startCreateProduct es ', error)
             
             if(error.response.status==410)
                 dispatch(onErrorMessage(`Producto ${product.title} ya existe pero fue eliminado, debes reestablecerlo o usar otro nombre`))
 
             if(error.response.status==400){
-                dispatch(onErrorMessage(error.response.data.message.toString))
+                dispatch(onErrorMessage(error.response.data.message.toString()))
             }
 
             
@@ -130,16 +128,44 @@ export const startCreateProduct=(product)=>{
     }
 }
 
-export const startCreateCategory=(category)=>{}
+export const startCreateCategory=(category)=>{
+    return async(dispatch) =>{
+        console.log('estoy en startCreateCategory')
+        dispatch(communicatingBackend())
+        try{
+            console.log('voy a enviar la categoria al backend ', {category})
+            const {data} = await quoterApi.post('/categories', category);
+            console.log('recibo la data ', {data})
+            dispatch(setActiveCategory(data));
+            dispatch(onAddNewCategory(data))
+            dispatch(setQuoterProcess('edit'));
+              
+            //dispatch(setActiveProduct(data))
+        }catch(error){
+            console.log('error es ', error)
+            
+            if(error.response.status==410)
+                dispatch(onErrorMessage(`Categoria ${category.title} ya existe pero fue eliminado, debes reestablecerlo o usar otro nombre`))
+
+            if(error.response.status==400){
+                dispatch(onErrorMessage(error.response.data.message.toString()))
+            }
+
+            
+            setTimeout(()=>{
+                dispatch(clearErrorMessage());
+            },10);
+        }
+        dispatch(setIsSaving(false)); 
+    }
+}
 
 export const startUpdateCategory=(category)=>{
     return async(dispatch) =>{
         dispatch(communicatingBackend())
         try{
             const {id, isactive, user, ...categoryToUpdate}=category;
-            console.log('voy a actualizar ',categoryToUpdate)
             const {data} = await quoterApi.patch('/categories/'+id, categoryToUpdate);
-            console.log('categoria actualizada ...',data )
             dispatch(setActiveCategory(data))
             dispatch(onUpdateCategory(data));
             dispatch(setIsSaving(false));        
@@ -155,10 +181,9 @@ export const startUpdateCategory=(category)=>{
             if(error.response.status==410)
                 dispatch(onErrorMessage(`Categoría con id ${category.id} fue eliminado, hablar con el admin para reestablecerlo`))
 
-            if(error.response.status==400){
+            if(error.response.status==400)
                 dispatch(onErrorMessage(error.response.data.message.toString()))
-                
-            }
+            
 
         dispatch(setIsSaving(false));
         setTimeout(()=>{
@@ -167,6 +192,71 @@ export const startUpdateCategory=(category)=>{
         }
     }
 }
+
+export const startUploadingFiles = (files=[], activeProduct,) => {
+
+    console.log('startUploadingFiles  files[0]',files[0]  )
+
+    const formData=new FormData();
+    formData.append('file',files[0]);
+
+    return async(dispatch, getState)=>{
+        dispatch(setIsSaving(true));        
+        const {id}=activeProduct;
+        try{
+            const {data} = await quoterApi.patch('/files/product/'+id, formData);
+            console.log( 'data de imagen', data)
+
+            const productUpdated={
+                ...activeProduct,
+                image: data.image,
+                user: data.user,
+            }
+
+            const {user, category, ...resto }=productUpdated;
+
+            dispatch(setActiveProduct(productUpdated))
+            dispatch(setActiveProductToEdit({...resto, categoryId:category.id}))  
+            dispatch(onUpdateProduct(productUpdated));      
+        
+        
+        }catch(error){
+            console.log('error subiendo imagen ....', error)
+            if(error.response.status==403)
+                dispatch(onErrorMessage(`no tienes los permisos para hacer esta función`))
+
+            if(error.response.status==404)
+                dispatch(onErrorMessage(`Categoría con id ${category.id} no existe en la base de datos`))
+
+            if(error.response.status==410)
+                dispatch(onErrorMessage(`Categoría con id ${category.id} fue eliminado, hablar con el admin para reestablecerlo`))
+
+            if(error.response.status==400)
+                dispatch(onErrorMessage(error.response.data.message.toString()))
+
+        setTimeout(()=>{
+            dispatch(clearErrorMessage());
+        },10);
+
+        }
+        
+        //const {activeNote} = getState().journal;
+        
+        //const {image}=await fileUpload(files[0])  // Si fuera solo un archivo
+        /* const productoToUpdate {
+            ...setActiveProduct,
+            image
+        }*/
+        
+
+
+
+        //dispatch(setPhotosToActiveNote(imageUrl)); 
+        dispatch(setIsSaving(false));
+
+    }
+}
+
 
 
 

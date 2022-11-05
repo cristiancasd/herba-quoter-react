@@ -2,10 +2,12 @@ import { TurnedInNot , Stars, StartSharp} from '@mui/icons-material'
 import { Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar,  } from '@mui/material'
 import React, { useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux/es/exports'
-import { setActiveProduct, setActiveProductToEdit} from '../../store/quoter/quoterSlice'
+import { handleMobileOpen, setActiveProduct, setActiveProductToEdit} from '../../store/quoter/quoterSlice'
 
 
 export const SideBarItemProducts = (product) => {
+
+  const {mobileOpen, isScreenCel} = useSelector(state => state.quoter) 
 
   const {title, description}=product;
   const dispatch = useDispatch();
@@ -28,7 +30,9 @@ export const SideBarItemProducts = (product) => {
       dispatch(setActiveProduct(product))
       const {user, category, isactive, ...resto}=product;
       const productToEdit={ ...resto, categoryId: product.category.id}
-      dispatch(setActiveProductToEdit(productToEdit))
+      dispatch(setActiveProductToEdit(productToEdit));
+      
+      if(isScreenCel) dispatch(handleMobileOpen(!mobileOpen));
     }
 
   return (    

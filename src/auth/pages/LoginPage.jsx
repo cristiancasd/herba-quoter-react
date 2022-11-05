@@ -30,7 +30,8 @@ export const LoginPage = () => {
   } 
 
   const onGoogleSignIn = () => { 
-    dispatch(startGoogleSignIn()) //Función THUNKS 
+    //dispatch(startGoogleSignIn()) //Función THUNKS 
+    Swal.fire('Opción aún no implementada', 'error')
   }
 
   useEffect(()=>{

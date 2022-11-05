@@ -75,8 +75,10 @@ export const quoterSlice = createSlice({
     name: 'quoter',
 
     initialState:{
-        products:[tempProduct,tempProduct2,tempProduct3],
-        categories:[tempCategory, tempCategory2],  
+        //products:[tempProduct,tempProduct2,tempProduct3],
+        //categories:[tempCategory, tempCategory2],  
+        products:[],
+        categories:[],
         activeProductToEdit: null,
         activeProduct: null,
         activeCategory: null,        
@@ -87,6 +89,9 @@ export const quoterSlice = createSlice({
         quoterProcess: 'edit',
         errorMessage: null,
         isSaving: false,
+        mobileOpen: false,
+        isScreenCel: false,
+        selection:'product',
     },
 
     reducers:{
@@ -97,15 +102,17 @@ export const quoterSlice = createSlice({
         },
 
         setCategories: (state, {payload}) => {
-            state.statusQuoter='ok';
-            state.categoriesLoaded='ok';
+            console.log('estoy en setCategories')
             state.categories=payload;
+            state.statusQuoter='ok';
+            state.categoriesLoaded='ok';            
         },
 
         setProducts: (state, {payload}) => {
-            state.statusQuoter='ok';
-            state.productsLoaded='ok';
+            console.log('estoy en setProducts')
             state.products= payload;
+            state.statusQuoter='ok';
+            state.productsLoaded='ok';            
         },
 
 
@@ -114,49 +121,49 @@ export const quoterSlice = createSlice({
             state.productsLoaded='ok';
             state.categoriesLoaded='ok';
             state.products.push( payload );
-            state.activeProduct = null;
-            state.selection='product';
+            state.activeProduct = undefined;
+            //state.selection='product';
         },
         onUpdateProduct: ( state, { payload } ) => {
-            state.statusQuoter='ok';
-            state.productsLoaded='ok';
-            state.categoriesLoaded='ok';
-            state.selection='product';
             state.products = state.products.map( product => {
                 if ( product.id === payload.id ) {
                     return payload;
                 }
                 return product;
             });
+            state.statusQuoter='ok';
+            state.productsLoaded='ok';
+            state.categoriesLoaded='ok';
+            //state.selection='product';
+            
         },
         onAddNewCategory: ( state, { payload }) => {
             state.statusQuoter='ok';
             state.productsLoaded='ok';
             state.categoriesLoaded='ok';
-            state.selection=undefined;
             state.categories.push( payload );
-            state.activeCategory = null;
-            state.selection='category'
+            state.activeCategory = undefined;
+            //state.selection='category'
         },
         onUpdateCategory: ( state, { payload } ) => {
-            state.statusQuoter='ok';
-            state.productsLoaded='ok';
-            state.categoriesLoaded='ok';
-            state.selection='category'
             state.categories = state.categories.map( category => {
                 if ( category.id === payload.id ) {
                     return payload;
                 }
                 return category;
             });
+            state.statusQuoter='ok';
+            state.productsLoaded='ok';
+            state.categoriesLoaded='ok';
+            //state.selection='category'
+            
         },
 
         setActiveProduct: ( state, { payload } ) => {
             state.quoterProcess= 'edit';
             state.statusQuoter='ok';
-            //state.selectionType='product';
+            state.selection='product';
             state.activeProduct=payload;
-            //state.activeCategory={}; 
             state.activeCategory=undefined;           
         },
 
@@ -164,9 +171,14 @@ export const quoterSlice = createSlice({
             state.activeProductToEdit=payload;                      
         },
 
+        setActiveCategoryToAdd: ( state, { payload } ) => {
+            state.activeCategory=payload;                       
+        },
+
         setActiveCategory: ( state, { payload } ) => {
+            state.quoterProcess= 'edit';
             state.statusQuoter='ok';
-            //state.selectionType='category';
+            state.selection='category';
             //state.activeProduct={};
             state.activeProduct=undefined;
             state.activeCategory=payload;           
@@ -204,7 +216,15 @@ export const quoterSlice = createSlice({
         },
         setIsSaving: (state, {payload})=>{
             state.isSaving=payload;
-        } 
+        },
+        handleMobileOpen: (state, {payload})=>{
+            console.log('estoy en handleMobileOpen ')
+            state.mobileOpen= payload
+        },
+        setScreenCel: (state, {payload})=>{
+            console.log('estoy en setScreenCel ', )
+            state.isScreenCel= payload;
+        },
     },
 })
 
@@ -222,5 +242,8 @@ export const {
     onUpdateCategory,
     onAddNewProduct,
     onAddNewCategory,
-    setIsSaving
+    setIsSaving,
+    handleMobileOpen,
+    setScreenCel,
+    setActiveCategoryToAdd
  } = quoterSlice.actions

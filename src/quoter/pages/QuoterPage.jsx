@@ -2,42 +2,58 @@
 import { AddOutlined } from "@mui/icons-material"
 import { IconButton, Typography } from "@mui/material"
 import { useDispatch, useSelector } from "react-redux"
-import { setQuoterProcess, setActiveProductToEdit } from "../../store/quoter/quoterSlice"
+import { setQuoterProcess, setActiveProductToEdit, setActiveCategoryToAdd } from "../../store/quoter/quoterSlice"
 import { QuoterLayout } from "../layout/QuoterLayout"
 import { NewEditViewCategory } from "../views/NewEditViewCategory"
 import { NewEditViewProduct } from "../views/NewEditViewProduct"
 import { NothingSelectedView } from "../views/NothingSelectedView"
 
+
+
 export const QuoterPage = () => {
 
   const dispatch=useDispatch();
-  const { productsLoaded, categoriesLoaded, activeProduct, quoterProcess}= useSelector(state=>state.quoter)
+  const { productsLoaded, categoriesLoaded, activeProduct, activeCategory, quoterProcess, selection}= useSelector(state=>state.quoter)
+  const{user}= useSelector(state=> state.auth)
+  const isHired = user.rol=='user' ?{ display: 'none' } :{ display: '' }
 
   const startCreate=()=>{
-    const productReset =   {
-      id: '',
-      title: '',
-      pricepublic: 0,
-      price15: 0,
-      price25: 0,
-      price35: 0,
-      price42: 0,
-      price50: 0,
-      pv: 0,
-      sku: '',
-      image:'',
-      description: '',
-      categoryId: activeProduct.category.id
-    };
     dispatch(setQuoterProcess('create'));
-    dispatch(setActiveProductToEdit(productReset));
+    
+    if(activeProduct){
+      const productReset =   {
+        id: '',
+        title: '',
+        pricepublic: '',
+        price15: '',
+        price25: '',
+        price35: '',
+        price42: '',
+        price50: '',
+        pv: '',
+        sku: '',
+        image:'',
+        description: '',
+        categoryId: activeProduct.category.id
+      };    
+       dispatch(setActiveProductToEdit(productReset));
+    }
+
+    if(activeCategory){
+      const categoryReset = {
+        title: '',        
+        description: '',
+      };    
+       dispatch(setActiveCategoryToAdd(categoryReset));
+    }
   }
+
 
   return (
     <QuoterLayout>     
       {
         (productsLoaded && categoriesLoaded)
-          ? (activeProduct
+          ? (selection==='product'
               ?<NewEditViewProduct />
               :<NewEditViewCategory/>)
           : <NothingSelectedView />
@@ -45,6 +61,7 @@ export const QuoterPage = () => {
       
       <IconButton
         disabled={quoterProcess=='create'}
+        style={isHired}
         onClick={startCreate}
         size='large'
         sx={{
