@@ -83,7 +83,6 @@ export const quoterSlice = createSlice({
         activeProduct: null,
         activeCategory: null,        
         statusQuoter:'communicating',
-        activeQuoter: null, //true se puede ver los productos por medio de modals
         productsLoaded: null,
         categoriesLoaded: null,
         quoterProcess: 'edit',
@@ -92,6 +91,12 @@ export const quoterSlice = createSlice({
         mobileOpen: false,
         isScreenCel: false,
         selection:'product',
+
+
+
+        quoters:[],
+        activeQuoter:null,
+
     },
 
     reducers:{
@@ -225,6 +230,7 @@ export const quoterSlice = createSlice({
             console.log('estoy en setScreenCel ', )
             state.isScreenCel= payload;
         },
+        
     },
 })
 
@@ -245,5 +251,6 @@ export const {
     setIsSaving,
     handleMobileOpen,
     setScreenCel,
-    setActiveCategoryToAdd
+    setActiveCategoryToAdd, 
+    
  } = quoterSlice.actions

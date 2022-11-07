@@ -4,6 +4,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { AuthRoutes } from '../auth/routes/AuthRoutes'
 import { QuoterRoutes } from '../quoter/routes/QuoterRoutes'
 import { chekAuthToken } from '../store/auth/thunks'
+import { CheckingAuth } from '../ui/components/CheckingAuth'
 
 
 export const AppRouter = () => {
@@ -14,10 +15,8 @@ export const AppRouter = () => {
     dispatch(chekAuthToken())
   },[])
 
-  if(status==='checking'){
-    return(
-      <h3>Cargando...</h3>
-    )
+  if(status==='checking' ){
+    return <CheckingAuth/> 
   }
 
 
@@ -26,10 +25,13 @@ export const AppRouter = () => {
        
       {
         (status === 'not-authenticated')
-          ? <Route path='/auth/*' element={<AuthRoutes /> } />
+          ? <Route path='/*' element={<AuthRoutes /> } />
           : <Route path='/*' element={<QuoterRoutes/>} />
       }
-      <Route path='/*' element={<Navigate to='/auth/login' /> } />
+      {
+        //<Route path='/*' element={<Navigate to='/auth/login' /> } />
+      }
+      
     </Routes>
   )
 }

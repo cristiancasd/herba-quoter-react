@@ -1,8 +1,10 @@
 import { LogoutOutlined, MenuOutlined } from "@mui/icons-material"
 import { AppBar, Avatar, Box, Button, Grid, IconButton, Menu, MenuItem, Toolbar, Tooltip, Typography } from "@mui/material"
+import { useState } from "react";
 import { useDispatch, useSelector,  } from "react-redux";
+import { Link, Navigate, NavLink } from "react-router-dom";
 import { startLogout } from "../../store/auth/thunks";
-import { handleMobileOpen } from "../../store/quoter/quoterSlice";
+import { handleMobileOpen, setQuoterPage } from "../../store/quoter/quoterSlice";
 
 
 const pages = ['Quoter', 'Categ/Prod', 'Admin'];
@@ -11,15 +13,30 @@ const settings = ['Profile', 'Edit Profile', 'Logout'];
 export const Navbar = ({drawerWidth=240}) => {
   const dispatch = useDispatch();  
 
-  const {mobileOpen } = useSelector(state => state.quoter)
+  const {mobileOpen, activeProduct } = useSelector(state => state.quoter)
   const {user } = useSelector(state => state.auth)
+  
+  const [anchorElUser, setAnchorElUser] = useState(null);
+  
+  const handleOpenUserMenu = (event) => {
+    setAnchorElUser(event.currentTarget);
+  };
+
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
+  };
+ 
+
   const logout = () => { 
-    dispatch(startLogout()) //Función THUNKS 
+    dispatch(startLogout())
+    setAnchorElUser(null);
   }
 
   const handleDrawerToggle = () => { 
     dispatch(handleMobileOpen(!mobileOpen))  
   }
+
+
 
 
   
@@ -43,34 +60,35 @@ export const Navbar = ({drawerWidth=240}) => {
         <Grid container direction='row' justifyContent='space-between'>
 
           <Box sx={{ flexGrow: 1, display: 'flex' }}>
-            {pages.map((page) => (
-              <Button
-                key={page}
-                sx={{ my: 2, color: 'white', display: 'block' }}
-              >
-                {page}
-              </Button>
-            ))}
+          <Link to="/quoter">
+            <Button sx={{ my: 2, color: 'white', display: 'block' }}
+                >
+                    Quoter
+                  
+            </Button>
+          </Link>
+
+          
+          <Link to="/products">
+            <Button sx={{ my: 2, color: 'white', display: 'block' }}
+            >
+                    Products
+            </Button>
+          </Link>
           </Box>
 
-          <IconButton 
-            color='error'
-            onClick={logout} >            
-            <LogoutOutlined/>
-          </IconButton>
 
-
-
-          <Box sx={{ flexGrow: 0 }}
-          style={{display: 'none'}}>
+          <Box sx={{ flexGrow: 0, display: 'flex'}}
+          >
             <Tooltip title="Open settings">
-              <IconButton  sx={{ p: 0 }}>
+            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
                 <Avatar alt="Remy Sharp" src={user.image} />
               </IconButton>
             </Tooltip>
             <Menu
               sx={{ mt: '45px' }}
               id="menu-appbar"
+              anchorEl={anchorElUser}
               anchorOrigin={{
                 vertical: 'top',
                 horizontal: 'right',
@@ -80,20 +98,21 @@ export const Navbar = ({drawerWidth=240}) => {
                 vertical: 'top',
                 horizontal: 'right',
               }}
+              open={Boolean(anchorElUser)}
+              onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
-                <MenuItem key={setting}>
-                  <Typography textAlign="center">{setting}</Typography>
+                <MenuItem key='editProfile' onClick={handleCloseUserMenu}>
+                  <Typography textAlign="center">Edit Profile</Typography>
                 </MenuItem>
-              ))}
+                <MenuItem key='logout' onClick={logout}>
+                  <Typography textAlign="center">Logout</Typography>
+                </MenuItem>
+
             </Menu>
           </Box>
 
-
-
-
         </Grid>
-        
+
       </Toolbar>
     </AppBar>
   )

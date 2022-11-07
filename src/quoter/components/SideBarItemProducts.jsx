@@ -26,7 +26,7 @@ export const SideBarItemProducts = (product) => {
 
 
 
-  const onClickNote =()=>{
+  const onClickProduct =()=>{
       dispatch(setActiveProduct(product))
       const {user, category, isactive, ...resto}=product;
       const productToEdit={ ...resto, categoryId: product.category.id}
@@ -38,7 +38,7 @@ export const SideBarItemProducts = (product) => {
   return (    
       <ListItem 
       disablePadding>
-        <ListItemButton onClick={onClickNote}>
+        <ListItemButton onClick={onClickProduct}>
           <ListItemIcon>
               <StartSharp />
           </ListItemIcon>

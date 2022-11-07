@@ -10,7 +10,7 @@ import { NothingSelectedView } from "../views/NothingSelectedView"
 
 
 
-export const QuoterPage = () => {
+export const ProductCategoryPage = () => {
 
   const dispatch=useDispatch();
   const { productsLoaded, categoriesLoaded, activeProduct, activeCategory, quoterProcess, selection}= useSelector(state=>state.quoter)
@@ -19,13 +19,45 @@ export const QuoterPage = () => {
 
   const startCreate=()=>{
     dispatch(setQuoterProcess('create'));
+    
+    if(activeProduct){
+      const productReset =   {
+        id: '',
+        title: '',
+        pricepublic: '',
+        price15: '',
+        price25: '',
+        price35: '',
+        price42: '',
+        price50: '',
+        pv: '',
+        sku: '',
+        image:'',
+        description: '',
+        categoryId: activeProduct.category.id
+      };    
+       dispatch(setActiveProductToEdit(productReset));
+    }
+
+    if(activeCategory){
+      const categoryReset = {
+        title: '',        
+        description: '',
+      };    
+       dispatch(setActiveCategoryToAdd(categoryReset));
+    }
   }
 
 
   return (
     <QuoterLayout>     
-      Hola Estoy en quoter
-      
+      {
+        (productsLoaded && categoriesLoaded)
+          ? (selection==='product'
+              ?<NewEditViewProduct />
+              :<NewEditViewCategory/>)
+          : <NothingSelectedView />
+      } 
       
       <IconButton
         disabled={quoterProcess=='create'}
