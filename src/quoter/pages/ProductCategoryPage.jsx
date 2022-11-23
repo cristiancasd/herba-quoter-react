@@ -1,8 +1,9 @@
 
 import { AddOutlined } from "@mui/icons-material"
 import { IconButton, Typography } from "@mui/material"
+import { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { setQuoterProcess, setActiveProductToEdit, setActiveCategoryToAdd } from "../../store/quoter/quoterSlice"
+import { setQuoterProcess, setActiveProductToEdit, setActiveCategoryToAdd, setActiveQuoter } from "../../store/quoter/quoterSlice"
 import { QuoterLayout } from "../layout/QuoterLayout"
 import { NewEditViewCategory } from "../views/NewEditViewCategory"
 import { NewEditViewProduct } from "../views/NewEditViewProduct"
@@ -17,7 +18,7 @@ export const ProductCategoryPage = () => {
   const{user}= useSelector(state=> state.auth)
   const isHired = user.rol=='user' ?{ display: 'none' } :{ display: '' }
 
-  const startCreate=()=>{
+  const startCreate=()=>{ 
     dispatch(setQuoterProcess('create'));
     
     if(activeProduct){
@@ -48,6 +49,11 @@ export const ProductCategoryPage = () => {
     }
   }
 
+  useEffect(() => {
+    dispatch(setActiveQuoter(undefined))
+  }, [])
+  
+
 
   return (
     <QuoterLayout>     
@@ -69,7 +75,7 @@ export const ProductCategoryPage = () => {
           backgroundColor: 'error.main',
           ':hover':{backgroundColor: 'error.main', 
                     opacity:0.9},
-          position: 'fixed',
+          position: 'fixed', 
           right: 50,
           bottom: 50
         }}>

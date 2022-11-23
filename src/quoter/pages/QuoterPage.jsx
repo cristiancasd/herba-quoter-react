@@ -1,30 +1,61 @@
 
 import { AddOutlined } from "@mui/icons-material"
 import { IconButton, Typography } from "@mui/material"
+import { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { setQuoterProcess, setActiveProductToEdit, setActiveCategoryToAdd } from "../../store/quoter/quoterSlice"
+import { setQuoterProcess, setActiveProductToEdit, setActiveCategoryToAdd, setActiveQuoter, setActiveQuoterToEdit } from "../../store/quoter/quoterSlice"
+import { CheckingAuth } from "../../ui/components/CheckingAuth"
 import { QuoterLayout } from "../layout/QuoterLayout"
 import { NewEditViewCategory } from "../views/NewEditViewCategory"
 import { NewEditViewProduct } from "../views/NewEditViewProduct"
+import { NewEditViewQuoter } from "../views/NewEditViewQuoter"
 import { NothingSelectedView } from "../views/NothingSelectedView"
+import { ViewAddProductsQuoter } from "../views/ViewAddProductsQuoter"
 
 
 
 export const QuoterPage = () => {
 
   const dispatch=useDispatch();
-  const { productsLoaded, categoriesLoaded, activeProduct, activeCategory, quoterProcess, selection}= useSelector(state=>state.quoter)
+  const { quoterProcess, activeQuoter, quoters, isAddProductQuoterProcess}= useSelector(state=>state.quoter)
   const{user}= useSelector(state=> state.auth)
   const isHired = user.rol=='user' ?{ display: 'none' } :{ display: '' }
 
+  useEffect(() => {
+    dispatch(setActiveQuoter(quoters[0]))
+  }, [])
+
   const startCreate=()=>{
+    
+    if (activeQuoter){
+      const quoterReset={
+        id:'',
+        title:'',
+        description:'',
+        products:[],
+      }
+      dispatch(setActiveQuoter(quoterReset));
+      dispatch(setActiveQuoterToEdit({title:'', description:''}));
+    }
     dispatch(setQuoterProcess('create'));
+  } 
+
+
+  if(!activeQuoter){
+    return <h3>Cargando ....</h3>//<CheckingAuth/> 
   }
 
 
+
+
   return (
-    <QuoterLayout>     
-      Hola Estoy en quoter
+    <QuoterLayout>    
+      { 
+        isAddProductQuoterProcess
+          ? <ViewAddProductsQuoter/>
+          : <NewEditViewQuoter/>
+      } 
+      
       
       
       <IconButton

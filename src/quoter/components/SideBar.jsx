@@ -8,6 +8,7 @@ import { startLoadingCategories, startLoadingProducts, } from "../../store/quote
 import { SideBarItemCategories } from "./SideBarItemCategories"
 import { SideBarItemProducts } from "./sideBarItemProducts"
 import { DrawerScreenSize } from "./DrawerScreenSize"    
+import { setOrderProducts } from "../../store/quoter/quoterSlice"
 
 export const SideBar = ({drawerWidth= 240}) => {
     
@@ -21,6 +22,20 @@ export const SideBar = ({drawerWidth= 240}) => {
     },[]);
 
     if(productsLoaded!=='ok'|| categoriesLoaded!=='ok'){
+/*
+      let productsArray=[];
+      let productsObject={};
+
+      categories.map( category => {
+        products.map(product=>{ 
+              if(product.category.id===category.id){
+                productsArray.push(product);
+                productsObject[product.id]=product;
+              }          
+          })
+      });
+      dispatch(setOrderProducts('algo'))
+*/
         return(
           <h3>Cargando...</h3>
         )

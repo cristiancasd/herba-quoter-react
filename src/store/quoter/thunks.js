@@ -18,6 +18,7 @@ export const startLoadingProducts=()=>{
             const productToEdit={ ...resto, categoryId: category.id};
             dispatch(setActiveProductToEdit(productToEdit));
             dispatch(setActiveProduct(data[0]));
+            
             dispatch(setProducts(data));   
         }catch(error){
             console.log('error es ', error);

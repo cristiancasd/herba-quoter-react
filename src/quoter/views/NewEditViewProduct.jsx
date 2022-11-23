@@ -32,7 +32,7 @@ export const NewEditViewProduct = () => {
     isFormValid, titleValid, skuValid,
     onInputChange, onResetForm} =useForm(activeProductToEdit, formValidations)
 
-    
+
 
     
     const fileInputRef=useRef();
@@ -46,6 +46,10 @@ export const NewEditViewProduct = () => {
         event.preventDefault();
         dispatch(setIsSaving(true));
         setFormSubmitted(true); //Cambiamos estado
+        let err='';
+        if(skuValid) err=' -'+skuValid;
+        if(titleValid) err= err+' -'+titleValid;
+        if(err!=='')Swal.fire('Llena correctamente el formulario', err, 'error');
         if(!isFormValid) return;
         quoterProcess==='edit'
             ? dispatch(startUpdateProduct(formState, activeProduct.category))        
@@ -152,7 +156,7 @@ export const NewEditViewProduct = () => {
             </Grid>    
         </Grid>
         <Grid container  spacing={2}>
-                    <Grid item xs={12}  md={6}>
+                    <Grid item xs={6}  md={6}>
                         <TextField
                         name="pricepublic"
                         onChange={onInputChange}
@@ -168,7 +172,7 @@ export const NewEditViewProduct = () => {
                         />
                     </Grid>
 
-                    <Grid item xs={12}  md={6}>
+                    <Grid item xs={6}  md={6}>
                         <TextField
                         type='number'
                         variant='filled'
@@ -184,7 +188,7 @@ export const NewEditViewProduct = () => {
                         />
                     </Grid>
 
-                    <Grid item xs={12}  md={6}>
+                    <Grid item xs={6}  md={6}>
                         <TextField
                             type='number'
                             variant='filled'
@@ -200,7 +204,7 @@ export const NewEditViewProduct = () => {
                             />
                     </Grid>
 
-                    <Grid item xs={12}  md={6}>
+                    <Grid item xs={6}  md={6}>
                         <TextField
                             type='number'
                             variant='filled'
@@ -216,7 +220,7 @@ export const NewEditViewProduct = () => {
                             />
                     </Grid>
 
-                    <Grid item xs={12}  md={6}>
+                    <Grid item xs={6}  md={6}>
                         <TextField
                             type='number'
                             variant='filled'
@@ -232,7 +236,7 @@ export const NewEditViewProduct = () => {
                             />
                     </Grid>
 
-                    <Grid item xs={12}  md={6}>
+                    <Grid item xs={6}  md={6}>
                         <TextField
                             type='number'
                             variant='filled'
@@ -247,7 +251,7 @@ export const NewEditViewProduct = () => {
                             inputProps={isReadOnly}
                             />
                     </Grid>
-                    <Grid item xs={12}  md={6}>
+                    <Grid item xs={6}  md={6}>
                         <TextField
                             type='number'
                             step='2'
@@ -263,7 +267,7 @@ export const NewEditViewProduct = () => {
                             inputProps={isReadOnly}
                             />
                     </Grid>
-                    <Grid item xs={12}  md={6}>
+                    <Grid item xs={6}  md={6}>
                         <TextField
                             type='text'
                             variant='filled'

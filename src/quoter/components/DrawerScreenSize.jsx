@@ -1,62 +1,75 @@
-import { TurnedInNot , Stars, StartSharp} from '@mui/icons-material'
+import { TurnedInNot , Stars, StartSharp, StarOutlined} from '@mui/icons-material'
 import { Divider, Drawer, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar, Typography,  } from '@mui/material'
 import React, { useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux/es/exports'
-import { handleMobileOpen, setScreenCel} from '../../store/quoter/quoterSlice'
+import { handleMobileOpen, setIsAddProductQuoterProcess, setOrderProducts, setScreenCel} from '../../store/quoter/quoterSlice'
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { SideBarItemCategories } from './SideBarItemCategories'
 import { SideBarItemProducts } from './sideBarItemProducts'
+import { SideBarItemQuoters } from './SideBarItemQuoters'
 
-const buildMenu=(categories,products)=>{
-  let toShowMenu=[]
-  categories.map( category => {
-    toShowMenu.push(<SideBarItemCategories key={category.id}{ ...category}/>);
-      products.map(product=>{
-          if(product.category.id===category.id){
-            toShowMenu.push(<SideBarItemProducts key={product.id}{ ...product }/>);
-          }
-          return           
-      })
-    return
-    });
-    return toShowMenu;
-}
 
 export const DrawerScreenSize = (data) => {
   
-  const {mobileOpen, isScreenCel, categories, products} = useSelector(state => state.quoter) 
-  const{userName,menuProductosCategorias, drawerWidth }=data;
+  const {mobileOpen, isScreenCel, categories, products, quoters, activeQuoter} = useSelector(state => state.quoter) 
+  const{userName, menuProductosCategorias, drawerWidth }=data;
   //const toShowMenu= useMemo((() => buildMenu(categories,products),[products]))
   const dispatch = useDispatch();
   
+ 
+ 
+  const onClickQuoter =()=>{
+    dispatch(setIsAddProductQuoterProcess(true))
+  }
   let toShowMenu=[];
-  categories.map( category => {
-    toShowMenu.push(<SideBarItemCategories key={category.id}{ ...category}/>);
-      products.map(product=>{
-          if(product.category.id===category.id){
-            toShowMenu.push(<SideBarItemProducts key={product.id}{ ...product }/>);
-          }
-          return           
-      })
-    return
-    });
+  
+  
+  if(activeQuoter){ 
+    
+    toShowMenu.push(
+      <ListItem key='addProduct'
+      disablePadding>
+        <ListItemButton onClick={onClickQuoter}>
+          <ListItemIcon>
+              <StarOutlined />
+          </ListItemIcon>
+              <Grid container>
+                  <ListItemText primary='Add product' />
+              </Grid>
+        </ListItemButton>
+      </ListItem>
+    )
+
+    quoters.map(quoter=>{
+      toShowMenu.push(<SideBarItemQuoters key={quoter.id}{ ...quoter}/>);
+    })
+  }else{
+    
+    categories.map( category => {
+      toShowMenu.push(<SideBarItemCategories key={category.id}{ ...category}/>);
+        products.map(product=>{ 
+            if(product.category.id===category.id){
+              toShowMenu.push(<SideBarItemProducts key={product.id}{ ...product }/>);
+            }
+            return           
+        })
+      return
+      });
+  }
 
   const toShow=
   <>
       <Toolbar>
           <Typography variant='h6' noWrap component='div'>
               {userName}
-          </Typography>            
-              <Divider/>
-      </Toolbar>          
+          </Typography>              
+      </Toolbar>
+      <Divider variant="middle" /> 
       <List> 
+      
           {
             toShowMenu
-          //menuProductosCategorias
-        }
-
-
-        
+          }
       </List>
   </>
 

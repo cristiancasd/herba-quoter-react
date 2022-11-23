@@ -3,22 +3,18 @@ const tempUser={
     id: 'erewrewr',
     fullname:'carlos eduardo'
 }
-
-
 const tempCategory = {
     id: '32432423',
     title: 'proteínas',
     description: 'Salud Muscular',  
     user:tempUser,
 }
-
 const tempCategory2 = {
     id: '32432424',
     title: 'Digestivos',
     description: 'salud digestiva',
     user:tempUser,
 }
-
 const tempProduct =   {
     id: '000',
     title: 'PDM',
@@ -35,7 +31,6 @@ const tempProduct =   {
     user:tempUser,
     category: tempCategory
 };
-
 const tempProduct2 =   {
     id: '111',
     title: 'rebuild',
@@ -52,7 +47,6 @@ const tempProduct2 =   {
     user:tempUser,
     category: tempCategory
 };
-
 const tempProduct3 =   {
     id: '2222',
     title: 'aloe',
@@ -70,6 +64,51 @@ const tempProduct3 =   {
     category: tempCategory2
 };
 
+const activeQuoterExample={
+    id:'123',
+    title: 'ejemplo quoter',
+    description: 'ejemplo de quoters',
+    img:'',
+    products:{
+        '567cab15-71fb-4dac-bc7a-7cbbb5e34ff5':{
+            title: 'X-tra Cal',
+            quantity: 4,
+            unitPrice:10,
+            total: 40
+        },
+        'cffc2362-14ed-4996-a7bc-18083e5d9620':{
+            title: 'Batido nutricional',
+            quantity: 3,
+            unitPrice:20,
+            total: 60
+        },
+    }
+}
+
+const activeQuoterExample2={
+    id:'124',
+    title: 'segundo quoter 2',
+    description: 'Segunda descrip',
+    img:'',
+    products:{
+        '567cab15-71fb-4dac-bc7a-7cbbb5e34ff5':{
+            title: 'X-tra Cal',
+            quantity: 1,
+            unitPrice:10,
+            total: 10
+        },
+        'cffc2362-14ed-4996-a7bc-18083e5d9620':{
+            title: 'Batido nutricional',
+            quantity: 2,
+            unitPrice:20,
+            total: 40
+        },
+    }
+    
+    
+}
+
+
 
 export const quoterSlice = createSlice({
     name: 'quoter',
@@ -79,6 +118,7 @@ export const quoterSlice = createSlice({
         //categories:[tempCategory, tempCategory2],  
         products:[],
         categories:[],
+        orderProducts:{},
         activeProductToEdit: null,
         activeProduct: null,
         activeCategory: null,        
@@ -93,13 +133,20 @@ export const quoterSlice = createSlice({
         selection:'product',
 
 
+        isAddProductQuoterProcess: true,
+        quoters:[activeQuoterExample, activeQuoterExample2],
+        activeQuoter:activeQuoterExample,
+        activeQuoterToEdit:{
+            title: activeQuoterExample.title,
+            description: activeQuoterExample.description
+        },
 
-        quoters:[],
-        activeQuoter:null,
+        temporalQuoter:{},
 
     },
 
     reducers:{
+
 
         setLoadedProductsCategories: (state, {payload}) => {
             productsLoaded= null;
@@ -120,6 +167,10 @@ export const quoterSlice = createSlice({
             state.productsLoaded='ok';            
         },
 
+        setOrderProducts: (state, {payload}) =>{
+            console.log('estoy en orderProducts', payload)
+            state.orderProducts=payload
+        },
 
         onAddNewProduct: ( state, { payload }) => {
             state.statusQuoter='ok';
@@ -230,11 +281,46 @@ export const quoterSlice = createSlice({
             console.log('estoy en setScreenCel ', )
             state.isScreenCel= payload;
         },
+
+        setDeleteQuoterProduct:(state, {payload})=>{
+            console.log('estoy en setDeleteQuoterProduct ', )
+            let newProductsList={...state.activeQuoter.products}
+            delete newProductsList[payload]
+            state.activeQuoter= {
+                ...state.activeQuoter,
+                products: {...newProductsList}
+            };
+        },
         
+        setActiveQuoter:(state, {payload})=>{
+            console.log('estoy en setActiveQuoter');
+            console.log('activeQuoterExample es ', activeQuoterExample);
+            state.quoterProcess= 'edit';
+            state.activeQuoter=payload
+           // (payload=='') 
+             //   ? state.activeQuoter=undefined
+               // : state.activeQuoter=payload
+            console.log('activeQuote es ', state.activeQuoter)
+        },
+        setActiveQuoterToEdit:(state, {payload})=>{
+            state.activeQuoterToEdit=payload;          
+        },
+
+        setIsAddProductQuoterProcess: (state, {payload})=>{
+            state.isAddProductQuoterProcess=payload;         
+        },
+
+        setTemporalQuoter:(state,{payload})=>{
+            console.log('estoy en setTemporalQuoter ,', {payload})
+            payload.quantity>0
+                ? state.temporalQuoter[payload.product]= payload.quantity
+                : delete state.temporalQuoter[payload.product];
+        },
     },
 })
 
 export const { 
+    setOrderProducts,
     setActiveProduct,
     setActiveCategory,
     communicatingBackend,
@@ -252,5 +338,10 @@ export const {
     handleMobileOpen,
     setScreenCel,
     setActiveCategoryToAdd, 
-    
+    setDeleteQuoterProduct,
+    setActiveQuoter,
+    setActiveQuoterToEdit,
+    setIsAddProductQuoterProcess,
+    setTemporalQuoter,
+
  } = quoterSlice.actions

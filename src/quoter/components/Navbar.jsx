@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useDispatch, useSelector,  } from "react-redux";
 import { Link, Navigate, NavLink } from "react-router-dom";
 import { startLogout } from "../../store/auth/thunks";
-import { handleMobileOpen, setQuoterPage } from "../../store/quoter/quoterSlice";
+import { handleMobileOpen } from "../../store/quoter/quoterSlice";
 
 
 const pages = ['Quoter', 'Categ/Prod', 'Admin'];
