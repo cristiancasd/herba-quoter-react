@@ -5,32 +5,40 @@ import { setTemporalQuoter } from "../../store/quoter/quoterSlice";
 
 export const AddProductQuoterItem=(product)=> {
 
-    const {temporalQuoter}=useSelector(state=> state.quoter);
-      
+    const {activeQuoter}=useSelector(state=> state.quoter);
+    
     
     const dispatch = useDispatch();
-    const [counter, setCounter]= useState(temporalQuoter[product.id] ? temporalQuoter[product.id] : '0' );
+    const [counter, setCounter]= useState(activeQuoter.products[product.sku] ? activeQuoter.products[product.sku].quantity : '0' );
 
     const onInputChange=({target})=>{
 
-        const newValue= +target.value>=0 || target.value==''
+        let newValue= +target.value>=0 || target.value==''
             ? (target.value) 
             : (0)
+        
+            
+        if(newValue!=counter){            
+            
+            console.log('newValue en el condicional', newValue);
 
-        if(newValue!=counter){
-            dispatch(setTemporalQuoter({product:product.id, quantity:+newValue}))
-            setCounter(newValue);
+            if(newValue!='') newValue= (+newValue).toFixed()
+            const total= +newValue*product.pricepublic ;
+            dispatch(setTemporalQuoter({sku:product.sku, quantity:+newValue, total }));
+            setCounter(newValue)   
         }
     }
 
-    const counterChange=(operation)=>{
+    const counterChange=async (operation)=>{
 
         const newValue= operation=='increment'
             ? (+counter+1)
             : (counter>0 ? +counter-1 : 0);
 
         if(newValue!=counter){
-            dispatch(setTemporalQuoter({product:product.id, quantity:newValue}))
+           
+            const total= +newValue*product.pricepublic 
+            dispatch(setTemporalQuoter({sku:product.sku, quantity:newValue, total}))
             setCounter(newValue);
         }
     }
@@ -48,7 +56,7 @@ export const AddProductQuoterItem=(product)=> {
             marginBottom: '15px'
         
         }}>
-            <Grid container spacing={2} >
+            <Grid container  >
                 <Grid item xs={12} md={8}>
                     <Typography variant='h6' noWrap component='div'>
                         {product.title}
@@ -57,7 +65,10 @@ export const AddProductQuoterItem=(product)=> {
                         {product.description}
                     </Typography> 
                     <Typography variant='h12' noWrap component='div'>
-                        Precio: $ {product.pricepublic}
+                        Precio: $ {product.pricepublic.toLocaleString('es-CO')}
+                    </Typography> 
+                    <Typography variant='h20' noWrap component='div'>
+                        PV: {product.pv}
                     </Typography> 
                     </Grid>
                 

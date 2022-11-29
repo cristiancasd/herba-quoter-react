@@ -9,19 +9,24 @@ export const ImageGallery=()=> {
   
   let itemData=[];
   try{
+
     activeQuoter
-      ?itemData = [{ img: activeQuoter.image, title: activeQuoter.title,}]
-      :itemData = [{ img: activeProductToEdit.image,title: activeProductToEdit.title,}]
+      ? itemData = [{ img: activeQuoter.image, title: activeQuoter.title,}]
+      : itemData = [{ img: activeProductToEdit.image,title: activeProductToEdit.title,}]
+    console.log('itemData', {itemData, vector: itemData[0], vimg: itemData[0].img } )
+    if(itemData[0].img=='' || !itemData[0].img) itemData=[{img: imageError, title: 'error'}, ]
+
   }catch(error){
+    console.log('estoy en el error al cargar la imagen ', error)
     itemData=[{
       img: imageError,
       title: 'error'
     }, ]
   }
   
+  
 
   return (
-    //<ImageList sx={{ width: '100%', height: 300 }} cols={1} rowHeight={164}>
     <ImageList sx={{ maxWidth: 300, }} cols={1} >
       {itemData.map((item) => (
         <ImageListItem key={item.title} >

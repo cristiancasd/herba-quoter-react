@@ -6,7 +6,11 @@ import { communicatingBackend, setActiveProductToEdit,
     
     clearErrorMessage,
       onErrorMessage, 
-      setIsSaving, setQuoterProcess} from "./quoterSlice";
+      setIsSaving, 
+      setQuoterProcess,
+      onUpdateQuoter,
+      onCreateQuoter,
+      setActiveQuoter} from "./quoterSlice";
 
 
 export const startLoadingProducts=()=>{
@@ -96,11 +100,12 @@ export const startUpdateProduct=(product, category)=>{
     }
 }
 
+
+
 export const startCreateProduct=(product)=>{
     return async(dispatch) =>{
         dispatch(communicatingBackend())
-        try{
-            
+        try{            
             const {id, ...productToCreate}=product;
             const dataAdapted= adapteVariablesToNumber(productToCreate);
             const {data} = await quoterApi.post('/products', dataAdapted);
@@ -131,12 +136,9 @@ export const startCreateProduct=(product)=>{
 
 export const startCreateCategory=(category)=>{
     return async(dispatch) =>{
-        console.log('estoy en startCreateCategory')
         dispatch(communicatingBackend())
         try{
-            console.log('voy a enviar la categoria al backend ', {category})
             const {data} = await quoterApi.post('/categories', category);
-            console.log('recibo la data ', {data})
             dispatch(setActiveCategory(data));
             dispatch(onAddNewCategory(data))
             dispatch(setQuoterProcess('edit'));
@@ -160,6 +162,25 @@ export const startCreateCategory=(category)=>{
         dispatch(setIsSaving(false)); 
     }
 }
+
+export const startCreateQuoter=(quoter)=>{
+    return async(dispatch) =>{
+        dispatch(communicatingBackend())
+        dispatch(onCreateQuoter(quoter))
+        dispatch(setQuoterProcess('edit'));
+        dispatch(setIsSaving(false));  
+    }
+}
+
+export const startUpdateQuoter=(quoter)=>{
+    return async(dispatch) =>{
+        dispatch(communicatingBackend())
+        dispatch(onUpdateQuoter(quoter))
+        dispatch(setQuoterProcess('edit'));
+        dispatch(setIsSaving(false));  
+    }
+}
+
 
 export const startUpdateCategory=(category)=>{
     return async(dispatch) =>{
@@ -196,7 +217,6 @@ export const startUpdateCategory=(category)=>{
 
 export const startUploadingFiles = (files=[], activeProduct,) => {
 
-    console.log('startUploadingFiles  files[0]',files[0]  )
 
     const formData=new FormData();
     formData.append('file',files[0]);
@@ -206,7 +226,6 @@ export const startUploadingFiles = (files=[], activeProduct,) => {
         const {id}=activeProduct;
         try{
             const {data} = await quoterApi.patch('/files/product/'+id, formData);
-            console.log( 'data de imagen', data)
 
             const productUpdated={
                 ...activeProduct,

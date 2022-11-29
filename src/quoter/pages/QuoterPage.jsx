@@ -33,6 +33,7 @@ export const QuoterPage = () => {
         title:'',
         description:'',
         products:[],
+        total:0,
       }
       dispatch(setActiveQuoter(quoterReset));
       dispatch(setActiveQuoterToEdit({title:'', description:''}));
@@ -42,7 +43,7 @@ export const QuoterPage = () => {
 
 
   if(!activeQuoter){
-    return <h3>Cargando ....</h3>//<CheckingAuth/> 
+    return <h3>Cargando ....</h3>
   }
 
 

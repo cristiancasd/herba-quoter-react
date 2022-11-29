@@ -13,7 +13,7 @@ const formData={
   fullname: '',
   email: '',
   herbalifelevel:'cliente',
-  rol:'', 
+  rol:'user', 
   country:'',
 }
 
@@ -111,6 +111,8 @@ export const RegisterPage = () => {
                   name="rol"
                   value={rol}
                   onChange={onInputChange}
+                  inputProps={{readOnly: true}}
+
                   />
               </Grid>
               <Grid item xs={12} sx={{mt:2}}>

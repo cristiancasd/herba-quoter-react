@@ -24,7 +24,6 @@ export const SideBarItemCategories = (category) => {
 
 
   const onClickCategory =()=>{
-    console.log('di click en categoría')
     dispatch(setActiveCategory(category))  
     const {user, isactive, ...categoryToEdit}=category;
     if (isScreenCel) dispatch(handleMobileOpen(!mobileOpen))

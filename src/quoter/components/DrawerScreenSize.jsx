@@ -13,38 +13,18 @@ export const DrawerScreenSize = (data) => {
   
   const {mobileOpen, isScreenCel, categories, products, quoters, activeQuoter} = useSelector(state => state.quoter) 
   const{userName, menuProductosCategorias, drawerWidth }=data;
-  //const toShowMenu= useMemo((() => buildMenu(categories,products),[products]))
   const dispatch = useDispatch();
-  
- 
  
   const onClickQuoter =()=>{
     dispatch(setIsAddProductQuoterProcess(true))
   }
   let toShowMenu=[];
   
-  
   if(activeQuoter){ 
-    
-    toShowMenu.push(
-      <ListItem key='addProduct'
-      disablePadding>
-        <ListItemButton onClick={onClickQuoter}>
-          <ListItemIcon>
-              <StarOutlined />
-          </ListItemIcon>
-              <Grid container>
-                  <ListItemText primary='Add product' />
-              </Grid>
-        </ListItemButton>
-      </ListItem>
-    )
-
     quoters.map(quoter=>{
       toShowMenu.push(<SideBarItemQuoters key={quoter.id}{ ...quoter}/>);
     })
-  }else{
-    
+  }else{    
     categories.map( category => {
       toShowMenu.push(<SideBarItemCategories key={category.id}{ ...category}/>);
         products.map(product=>{ 
@@ -77,7 +57,6 @@ const handleDrawerToggle = () => {
   dispatch(handleMobileOpen(!mobileOpen))
 };   
 const wideScreenBig= (useMediaQuery('(min-width:600px)'))
-///if (wideScreenBig=== isScreenCel) dispatch(setScreenCel(!wideScreenBig));
 
 useEffect(() => {
   if (wideScreenBig=== isScreenCel) dispatch(setScreenCel(!wideScreenBig));

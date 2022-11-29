@@ -11,6 +11,9 @@ export const greenTheme = createTheme({
         },
         error: {
             main: red.A400
+        },
+        personal: {
+            main: '#465F3B'
         }
     }
 })

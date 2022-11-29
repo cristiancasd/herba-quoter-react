@@ -1,4 +1,4 @@
-import { SaveOutlined, SignalCellularNull, UploadOutlined, } from "@mui/icons-material"
+import { DeleteOutline, SaveOutlined, SignalCellularNull, Update, UploadOutlined, } from "@mui/icons-material"
 import { Grid, Select, TextField, Typography, MenuItem, InputLabel, Button, 
     TableContainer, Table, TableHead, TableCell, TableRow, TableBody, DialogContent, DialogContentText, Dialog, DialogTitle, Divider } from "@mui/material"
 import Paper from '@mui/material/Paper';
@@ -10,12 +10,13 @@ import Box from '@mui/material/Box';
 import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "../../hooks/useForm";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { startCreateProduct, startUpdateProduct, startUploadingFiles } from "../../store/quoter/thunks";
+import { startCreateProduct, startCreateQuoter, startUpdateProduct, startUpdateQuoter, startUploadingFiles } from "../../store/quoter/thunks";
 import Swal from 'sweetalert2'
-import { communicatingBackend, setDeleteQuoterProduct, setIsAddProductQuoterProcess, setIsSaving, setTemporalQuoter } from "../../store/quoter/quoterSlice";
+import { communicatingBackend, resetTemporalQuoter, setActiveQuoter, setDeleteQuoterProduct, setIsAddProductQuoterProcess, setIsSaving, setTemporalQuoter } from "../../store/quoter/quoterSlice";
+import { temporalQuoterToNewQuoter } from "../../helpers/temporalQuoterToNewQuoter";
 
-function createData(productId, title, quantity, unitPrice, total) {
-    return { productId, title, quantity, unitPrice, total };
+function createData(productSku, title, quantity, unitPrice, total) {
+    return { productSku, title, quantity, unitPrice, total };
   }
   
 
@@ -23,11 +24,10 @@ const formValidations={
     title: [(value)=>value.length>=2, 'El titulo debe tener al menos dos caracteres' ],
   }
 
-  let rows=[]
 export const NewEditViewQuoter = () => {
-    
+
     const{errorMessage, statusQuoter, quoterProcess,
-        activeQuoter, activeQuoterToEdit, temporalQuoter
+        activeQuoter, activeQuoterToEdit, temporalQuoter, products, isScreenCel, quoters
      }= useSelector(state=> state.quoter)
 
     const {title, description, formState, isFormValid, titleValid,
@@ -35,45 +35,43 @@ export const NewEditViewQuoter = () => {
 
     const fileInputRef=useRef();
     const dispatch=useDispatch();
+
+    let claves = Object.keys(activeQuoter.products); 
     
-    const productsQuoter={...activeQuoter.products}
-    let claves = Object.keys(productsQuoter); // claves = ["nombre", "color", "macho", "edad"]
-    rows=[]
+    const [productsQuoter, setProductsQuoter] = useState(activeQuoter.products);
+    const [initalQuoter, setInitialQuoter] = useState({}) ;
+    useEffect(() => {
+      const activeProductBeforeSaveUpdate = quoters.find(element => element.id == activeQuoter.id);
+      setProductsQuoter(activeProductBeforeSaveUpdate.products)
+    }, [])
     
+
+
+
+    const [rows, setRows]=useState([])
+   useEffect(() => {
+    let rowsTemporal=[]
+
     for(let i=0; i< claves.length; i++){
-        let productId = claves[i];
-
-        dispatch(
-            setTemporalQuoter(
-              {
-                product: productId, 
-                quantity: productsQuoter[productId].quantity
-              }
+        let productSku = claves[i];
+        rowsTemporal.push(
+         createData(
+                productSku,
+                activeQuoter.products[productSku].title, 
+                activeQuoter.products[productSku].quantity,
+                activeQuoter.products[productSku].unitPrice,
+                activeQuoter.products[productSku].total
             )
-        )
-
-        rows.push(
-            createData(
-                productId,
-                productsQuoter[productId].title, 
-                productsQuoter[productId].quantity,
-                productsQuoter[productId].unitPrice,
-                productsQuoter[productId].total
-            ),
-        )
         
+        )
     }
+    setRows(rowsTemporal)
     
+   }, [activeQuoter])
    
+    const [formSubmitted, setFormSubmitted] = useState(false);
 
-
-    
-
-    // Variable para saber si el formulario ya fue submitted
-    const [formSubmitted, setFormSubmitted] = useState(false)
-
-
-    const onClickSaveProduct = (event) =>{
+    const onClickSaveQuoter = (event) =>{
         event.preventDefault();
         dispatch(setIsSaving(true));
         setFormSubmitted(true); //Cambiamos estado
@@ -81,11 +79,17 @@ export const NewEditViewQuoter = () => {
         if(titleValid) err=' -'+titleValid;
         if(err!=='')Swal.fire('Llena correctamente el formulario', err, 'error');
         if(!isFormValid) return;
+        quoterProcess==='edit'
+          ? dispatch(startUpdateQuoter({...activeQuoter, title, description}))        
+          : dispatch(startCreateQuoter({...activeQuoter, title, description}));
+        dispatch(setActiveQuoter({...activeQuoter, title, description}));
+        setProductsQuoter(activeQuoter.products)
     }
 
-    const deleteProductList=(event, productId)=>{
-        console.log('id a borrar', productId)
-        if(activeQuoter.products[productId]) dispatch(setDeleteQuoterProduct(productId))
+    const deleteProductList=async (event, skuToDelete)=>{                
+        const newQuoterActive= await temporalQuoterToNewQuoter(activeQuoter, products, skuToDelete)
+        dispatch(setActiveQuoter(newQuoterActive));
+        console.log('newQuoterActive es ', newQuoterActive)
     }
 
     useEffect(()=>{
@@ -100,35 +104,34 @@ export const NewEditViewQuoter = () => {
       },[quoterProcess])
 
     const onFileInputChange=({target})=>{
+
         if(target.files===0)   return; 
+          Swal.fire('update image is not implemented yet', errorMessage, 'error')
+        
             //dispatch(startUploadingFiles(target.files,activeProduct,))
     }
 
 
-    const addNewProductsToQuoter=()=>{
+    const addNewProductsToQuoter=()=>{ 
       dispatch(setIsAddProductQuoterProcess(true))
-
     }
+
+    useEffect(() => {
+      if(quoterProcess=='create')
+      dispatch(resetTemporalQuoter({}))  
+    }, [quoterProcess])
+
 
   return (
   <>
 
-
-
-
   <form
-      onSubmit={onClickSaveProduct}>
+      onSubmit={onClickSaveQuoter}>
       <Box sx={{ flexGrow: 1 }}>
           <Grid container direction='row' justifyContent='space-between' alignItems='center' sx={{mb:1}} item xs={12}  md={12}>
               <Grid item>
                   <Typography fontSize={39} fontWeight='light'> {quoterProcess} Quoter</Typography>
-                  <Button  
-                      disabled={statusQuoter=='communicating'}
-                      onClick={addNewProductsToQuoter}
-                      color='primary' sx={{padding:2}}>
-                          <SaveOutlined sx={{fontSize: 30, mr:1}}/>
-                          Add Product
-                  </Button>
+                  
               </Grid>
               <Grid item>                  
                   <input
@@ -148,7 +151,12 @@ export const NewEditViewQuoter = () => {
                   </Button>
 
                   <Button 
-                      disabled={statusQuoter=='communicating'}
+                      disabled={
+                        statusQuoter=='communicating' ||
+                        (activeQuoter.title==title && 
+                          activeQuoter.description==description && 
+                          activeQuoter.products==productsQuoter)
+                       }
                       type="submit" 
                       color='primary' sx={{padding:2}}>
                           <SaveOutlined sx={{fontSize: 30, mr:1}}/>
@@ -156,54 +164,93 @@ export const NewEditViewQuoter = () => {
                   </Button>
               </Grid>    
           </Grid>
-
-
       </Box>
           
+      <Box sx={{ 
+        
+        backgroundColor: '#F1F4F1',
+        padding: '10px',
+        marginBottom:2,
+        maxWidth: '100%'
+        }}>
+        <Button  
+          variant="outlined"
+          disabled={statusQuoter=='communicating'}
+          onClick={addNewProductsToQuoter}
+          color='primary' 
+          sx={{marginBottom:2}}>
+            <Update sx={{fontSize: 30, mr:1}}/>
+            Add Product
+        </Button>
+      
+        <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+          <TableContainer >
+            <Table aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Prouduct</TableCell>
+                  <TableCell >Qty</TableCell>
+                  {(!isScreenCel)&&<TableCell >VU</TableCell>}
+                  <TableCell >VT</TableCell>
+                  <TableCell >Del</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {rows.map((row) => (
+                  <TableRow
+                    key={row.title}
+                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                  >
+                    <TableCell component="th" scope="row">{row.title}</TableCell>
+                    <TableCell >{row.quantity}</TableCell>
+                    {!isScreenCel &&<TableCell >{row.unitPrice.toLocaleString('es-CO')}</TableCell>}
+                    <TableCell >{row.total.toLocaleString('es-CO')}</TableCell>
+                    <TableCell >
+                      <Button onClick={(event)=> deleteProductList(event,row.productSku)} >
+                      <DeleteOutline sx={{fontSize: 25, mr:0}}/>
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
 
 
-      <Box sx={{ flexGrow: 1 }}>
-      <TableContainer component={Paper}>
-        <Table  aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell>Prouduct</TableCell>
-              <TableCell >Qty</TableCell>
-              <TableCell >VU</TableCell>
-              <TableCell >VT</TableCell>
-              <TableCell >Del</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((row) => (
-              <TableRow
-                key={row.title}
-                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">{row.title}</TableCell>
-                <TableCell >{row.quantity}</TableCell>
-                <TableCell >{row.unitPrice}</TableCell>
-                <TableCell >{row.total}</TableCell>
-                <TableCell ><Button onClick={(event)=> deleteProductList(event,row.productId)} >x</Button></TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Paper>
+        
+        <Grid container  spacing={2}  alignItems='center'>
+        <Grid item xs={12}  md={4}>
+          <TableContainer component={Paper} sx={{marginTop:2}}>
+            <Table>
+                <TableBody>
+                <TableRow>
+                    <TableCell colSpan={1}>TOTAL COP</TableCell>
+                    <TableCell align="center">$ {activeQuoter.total.toLocaleString('es-CO')}</TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell colSpan={1}>PV:</TableCell>
+                    <TableCell align="center">{activeQuoter.pv}</TableCell>
+                  </TableRow>
+                </TableBody>
+              </Table>
+          </TableContainer>
+        </Grid>
+        </Grid>
+
+        
       </Box>
-
-      
-
-
-
-      
+   
       <Box sx={{ flexGrow: 1 }}>
           <Grid container  spacing={2}  alignItems='center'>
               <Grid item xs={12}  md={3}>
                   <ImageGallery  />
               </Grid>
 
+ 
+
               <Grid item xs={12}  md={9}>
+                
                   <TextField
                       type='text'
                       variant='filled'

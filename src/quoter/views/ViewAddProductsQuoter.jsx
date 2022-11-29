@@ -1,46 +1,30 @@
 import { SaveOutlined, Update } from "@mui/icons-material";
 import { Box, Button, Container, Divider, Grid, List, ListItem, Stack, TextField, Typography,  } from "@mui/material"
-import { useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
+import { temporalQuoterToNewQuoter } from "../../helpers/temporalQuoterToNewQuoter";
 import { setActiveQuoter, setIsAddProductQuoterProcess } from "../../store/quoter/quoterSlice";
 import { AddProductQuoterItem } from "../components/AddProductQuoterItem";
-
+ 
 
 export const ViewAddProductsQuoter = () => {
 
-    const{products, temporalQuoter, activeQuoter}= useSelector(state=> state.quoter);
+    const{products, activeQuoter}= useSelector(state=> state.quoter);
     const dispatch=useDispatch()
 
-    const updateQuoter=()=>{
-        let products2={}
-        Object.entries(temporalQuoter).forEach(([key, value]) => {
-            const product=products.find(product=>product.id==key)
-            console.log('product ', product)
-            products2[key]={
-                quantity: value,
-                title: product.title,
-                unitPrice: product.pricepublic, 
-                total: value*product.pricepublic
-            }
-        });
-
-        const newQuoterActive={
-            ...activeQuoter,
-            products: products2
-        }
+    const updateQuoter=async()=>{
+        const newQuoterActive= await temporalQuoterToNewQuoter(activeQuoter, products)
         dispatch(setActiveQuoter(newQuoterActive));
-        console.log('products2 ', products2);
         dispatch(setIsAddProductQuoterProcess(false));
     }
 
     return(
         <Container maxWidth="sm">
-
             <Button 
+                variant="outlined"
                 onClick={updateQuoter}
                 color='primary' sx={{padding:2}}>
                 <Update sx={{fontSize: 30, mr:1}}/>
-                          Update Quoter
+                    Apply Changes
             </Button>
         
             <List>
@@ -52,13 +36,13 @@ export const ViewAddProductsQuoter = () => {
             </List>
          
             <Button 
+                variant="outlined"
                 onClick={updateQuoter}
                 sx={{padding:2}}>
                 <Update sx={{fontSize: 30, mr:1}}/>
-                          Update Quoter
+                    Apply Changes
             </Button>
-        </Container>
-        
+        </Container>   
     )
 }
 

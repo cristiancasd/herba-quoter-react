@@ -1,8 +1,8 @@
 import { LogoutOutlined, MenuOutlined } from "@mui/icons-material"
 import { AppBar, Avatar, Box, Button, Grid, IconButton, Menu, MenuItem, Toolbar, Tooltip, Typography } from "@mui/material"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector,  } from "react-redux";
-import { Link, Navigate, NavLink } from "react-router-dom";
+import { Link} from "react-router-dom";
 import { startLogout } from "../../store/auth/thunks";
 import { handleMobileOpen } from "../../store/quoter/quoterSlice";
 
@@ -13,7 +13,7 @@ const settings = ['Profile', 'Edit Profile', 'Logout'];
 export const Navbar = ({drawerWidth=240}) => {
   const dispatch = useDispatch();  
 
-  const {mobileOpen, activeProduct } = useSelector(state => state.quoter)
+  const {mobileOpen, activeQuoter } = useSelector(state => state.quoter)
   const {user } = useSelector(state => state.auth)
   
   const [anchorElUser, setAnchorElUser] = useState(null);
@@ -36,8 +36,12 @@ export const Navbar = ({drawerWidth=240}) => {
     dispatch(handleMobileOpen(!mobileOpen))  
   }
 
+  const[menu,setMenu]=useState('quoters');
 
-
+  useEffect(() => {
+    setMenu(activeQuoter ? 'quoters' : 'products')
+  }, [activeQuoter])
+  
 
   
   return (
@@ -60,18 +64,22 @@ export const Navbar = ({drawerWidth=240}) => {
         <Grid container direction='row' justifyContent='space-between'>
 
           <Box sx={{ flexGrow: 1, display: 'flex' }}>
+          
           <Link to="/quoter">
-            <Button sx={{ my: 2, color: 'white', display: 'block' }}
-                >
-                    Quoter
-                  
+            <Button 
+              sx={{ my: 2, color: 'white', display: 'block', }}
+              variant={menu=='quoters' ? 'contained' :''}
+              color='personal'
+                > Quoter     
             </Button>
           </Link>
 
           
           <Link to="/products">
             <Button sx={{ my: 2, color: 'white', display: 'block' }}
-            >
+              variant={menu=='products' ? 'contained' :''}
+              color='personal'
+              >
                     Products
             </Button>
           </Link>
