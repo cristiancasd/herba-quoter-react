@@ -1,8 +1,8 @@
-import { TurnedInNot , Stars, StartSharp, ArrowBack} from '@mui/icons-material'
+import { TurnedInNot , Stars, StartSharp, ArrowBack, StarOutlineOutlined, CalculateOutlined} from '@mui/icons-material'
 import { Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar,  } from '@mui/material'
 import React, { useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux/es/exports'
-import { handleMobileOpen, setActiveProduct, setActiveQuoterToEdit, setActiveQuoter, setIsAddProductQuoterProcess} from '../../store/quoter/quoterSlice'
+import { handleMobileOpen,  setActiveQuoterToEdit, setActiveQuoter, setIsAddProductQuoterProcess} from '../../store/quoter/quoterSlice'
 
 
 export const SideBarItemQuoters = (quoter) => {
@@ -39,7 +39,7 @@ export const SideBarItemQuoters = (quoter) => {
       disablePadding>
         <ListItemButton onClick={onClickQuoter}>
           <ListItemIcon>
-              <StartSharp />
+            <CalculateOutlined />
           </ListItemIcon>
               <Grid container>
                   <ListItemText primary={ newTitle } />

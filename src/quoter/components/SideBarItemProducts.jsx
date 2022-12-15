@@ -1,4 +1,4 @@
-import { TurnedInNot , Stars, StartSharp} from '@mui/icons-material'
+import { TurnedInNot , Stars, StartSharp, GradeOutlined, StarOutlineOutlined, KeyboardArrowRightOutlined} from '@mui/icons-material'
 import { Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar,  } from '@mui/material'
 import React, { useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux/es/exports'
@@ -40,7 +40,7 @@ export const SideBarItemProducts = (product) => {
       disablePadding>
         <ListItemButton onClick={onClickProduct}>
           <ListItemIcon>
-              <StartSharp />
+              <KeyboardArrowRightOutlined  />
           </ListItemIcon>
               <Grid container>
                   <ListItemText primary={ newTitle } />

@@ -1,7 +1,7 @@
 import { Box, Button, Divider, Grid, ListItem, Stack, TextField, Typography } from "@mui/material"
 import { useEffect, useState, } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { setTemporalQuoter } from "../../store/quoter/quoterSlice";
+import { setProductsActiveQuoter } from "../../store/quoter/quoterSlice";
 
 export const AddProductQuoterItem=(product)=> {
 
@@ -24,7 +24,7 @@ export const AddProductQuoterItem=(product)=> {
 
             if(newValue!='') newValue= (+newValue).toFixed()
             const total= +newValue*product.pricepublic ;
-            dispatch(setTemporalQuoter({sku:product.sku, quantity:+newValue, total }));
+            dispatch(setProductsActiveQuoter({sku:product.sku, quantity:+newValue, total }));
             setCounter(newValue)   
         }
     }
@@ -38,7 +38,7 @@ export const AddProductQuoterItem=(product)=> {
         if(newValue!=counter){
            
             const total= +newValue*product.pricepublic 
-            dispatch(setTemporalQuoter({sku:product.sku, quantity:newValue, total}))
+            dispatch(setProductsActiveQuoter({sku:product.sku, quantity:newValue, total}))
             setCounter(newValue);
         }
     }

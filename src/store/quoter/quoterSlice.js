@@ -133,8 +133,9 @@ export const quoterSlice = createSlice({
         productsLoaded: null,
         categoriesLoaded: null,
         quoterProcess: 'edit',
-        errorMessage: null,
-        isSaving: false,
+        errorMessage: undefined,
+        successMessage: undefined,
+        //isSaving: false,
         mobileOpen: false,
         isScreenCel: false,
         selection:'product',
@@ -181,7 +182,7 @@ export const quoterSlice = createSlice({
             state.productsLoaded='ok';
             state.categoriesLoaded='ok';
             state.products.push( payload );
-            state.activeProduct = undefined;
+            //state.activeProduct = undefined;
             //state.selection='product';
         },
         onUpdateProduct: ( state, { payload } ) => {
@@ -201,7 +202,7 @@ export const quoterSlice = createSlice({
             state.productsLoaded='ok';
             state.categoriesLoaded='ok';
             state.categories.push( payload );
-            state.activeCategory = undefined;
+            //state.activeCategory = undefined;
             //state.selection='category'
         },
         onUpdateCategory: ( state, { payload } ) => {
@@ -247,25 +248,15 @@ export const quoterSlice = createSlice({
             state.quoterProcess=payload;                      
         },
 
-        communicatingBackend: (state) => { 
-            //state.productsLoaded= null;
-            //state.categoriesLoaded= null;
-            state.statusQuoter='communicating'; 
-            state.errorMessage=undefined;
-            //state.selection='category'
+        communicatingBackend: (state, { payload }) => { 
+            //state: ok, communicating
+            payload
+                ? state.statusQuoter='communicating'
+                : state.statusQuoter='ok'
+            //state.errorMessage=undefined;
+            
         },
 
-        communicatingBackendCategory: (state) => { 
-            state.statusQuoter='communicating'; 
-            state.errorMessage=undefined;
-            //state.selection='category'
-        },
-
-        communicatingBackendProduct: (state) => { 
-            state.statusQuoter='communicating'; 
-            state.errorMessage=undefined;
-            //state.selection='product'
-        },
         onErrorMessage: (state, {payload})=>{
             state.errorMessage= payload;
         },
@@ -273,9 +264,18 @@ export const quoterSlice = createSlice({
             state.statusQuoter='ok';
             state.errorMessage= undefined;
         },
-        setIsSaving: (state, {payload})=>{
-            state.isSaving=payload;
+        onSuccessMessage: (state, {payload})=>{
+            state.successMessage= payload;
         },
+        clearSuccessMessage: (state)=>{
+            state.successMessage= undefined;
+        },
+
+
+
+        /*setIsSaving: (state, {payload})=>{
+            state.isSaving=payload;
+        },*/
         handleMobileOpen: (state, {payload})=>{
             console.log('estoy en handleMobileOpen ')
             state.mobileOpen= payload
@@ -312,18 +312,18 @@ export const quoterSlice = createSlice({
             state.isAddProductQuoterProcess=payload;         
         },
 
-        setTemporalQuoter:(state,{payload})=>{
-            console.log('estoy en setTemporalQuoter ,', {payload})
+        setProductsActiveQuoter:(state,{payload})=>{
+            console.log('estoy en setProductsActiveQuoter ,', {payload})
             const {sku, quantity, total}=payload;
             quantity>0
                 ? state.activeQuoter.products[sku]= {...state.activeQuoter.products[sku], quantity, total }
                 : delete state.activeQuoter.products[sku];
-        },
+        }, 
 
-        resetTemporalQuoter:(state)=>{
+        /*resetTemporalQuoter:(state)=>{
             console.log('estoy en resetTemporalQuoter ,')
             state.temporalQuoter={}
-        },
+        },*/
 
         onUpdateQuoter: ( state, { payload } ) => {
             state.quoters = state.quoters.map( quoter => {
@@ -357,15 +357,18 @@ export const {
     communicatingBackend,
     setCategories,
     setProducts,
-    clearErrorMessage,
-    setActiveProductToEdit,
     onErrorMessage,
+    onSuccessMessage,
+    clearErrorMessage,
+    clearSuccessMessage,
+    setActiveProductToEdit,
+    
     setQuoterProcess,
     onUpdateProduct,
     onUpdateCategory,
     onAddNewProduct,
     onAddNewCategory,
-    setIsSaving,
+    //setIsSaving,
     handleMobileOpen,
     setScreenCel,
     setActiveCategoryToAdd, 
@@ -373,8 +376,8 @@ export const {
     setActiveQuoter,
     setActiveQuoterToEdit,
     setIsAddProductQuoterProcess,
-    setTemporalQuoter,
-    resetTemporalQuoter,
+    setProductsActiveQuoter,
+    //resetTemporalQuoter,
     onUpdateQuoter,
     onCreateQuoter
 

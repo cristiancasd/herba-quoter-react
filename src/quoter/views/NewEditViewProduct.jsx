@@ -5,10 +5,10 @@ import { ImageGallery } from "../components/imageGallery"
 import Box from '@mui/material/Box';
 import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "../../hooks/useForm";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { startCreateProduct, startUpdateProduct, startUploadingFiles } from "../../store/quoter/thunks";
 import Swal from 'sweetalert2'
-import { communicatingBackend, setIsSaving } from "../../store/quoter/quoterSlice";
+//import { communicatingBackend, setIsSaving } from "../../store/quoter/quoterSlice";
 
 
 const formValidations={
@@ -20,7 +20,7 @@ const formValidations={
 export const NewEditViewProduct = () => {
     
     const{errorMessage, categories, activeProductToEdit, activeProduct,
-        statusQuoter, quoterProcess, }= useSelector(state=> state.quoter)
+        statusQuoter, quoterProcess, successMessage }= useSelector(state=> state.quoter)
 
     const{user}= useSelector(state=> state.auth)
     const isReadOnly =user.rol=='user' ?{ readOnly: true } :{ readOnly: false }
@@ -32,8 +32,6 @@ export const NewEditViewProduct = () => {
     isFormValid, titleValid, skuValid,
     onInputChange, onResetForm} =useForm(activeProductToEdit, formValidations)
 
-
-
     
     const fileInputRef=useRef();
     const dispatch=useDispatch();
@@ -44,24 +42,29 @@ export const NewEditViewProduct = () => {
 
     const onClickSaveProduct = (event) =>{
         event.preventDefault();
-        dispatch(setIsSaving(true));
+        //dispatch(setIsSaving(true));
         setFormSubmitted(true); //Cambiamos estado
         let err='';
         if(skuValid) err=' -'+skuValid;
         if(titleValid) err= err+' -'+titleValid;
-        if(err!=='')Swal.fire('Llena correctamente el formulario', err, 'error');
+        if(err!=='')Swal.fire('Formulary incorrect', err, 'error');
         if(!isFormValid) return;
         quoterProcess==='edit'
             ? dispatch(startUpdateProduct(formState, activeProduct.category))        
             : dispatch(startCreateProduct(formState));
+        
+
     }
 
     useEffect(()=>{
-        console.log('errorMessage en useEffect ',errorMessage)
-        if(errorMessage!== undefined && errorMessage!== null){
-          Swal.fire('Ocurrió un error', errorMessage, 'error')
-        }
+        if(errorMessage!== undefined && errorMessage!== null)
+            Swal.fire('Error', errorMessage, 'error')
       },[errorMessage])
+
+    useEffect(()=>{
+    if(successMessage) 
+        Swal.fire({icon: 'success', title: successMessage, showConfirmButton: false, timer: 1500})
+    }),[successMessage]
         
     useEffect(()=>{
         onResetForm()
@@ -100,12 +103,26 @@ export const NewEditViewProduct = () => {
                 </Button>
 
                 <Button 
-                    disabled={statusQuoter=='communicating'}
+                    disabled={
+                        statusQuoter=='communicating' ||
+                        (activeProduct.title==title && 
+                          activeProduct.description==description && 
+                          activeProduct.pricepublic==pricepublic &&
+                          activeProduct.price15==price15 && 
+                          activeProduct.price25==price25 && 
+                          activeProduct.price35==price35 &&
+                          activeProduct.price42==price42 && 
+                          activeProduct.price50==price50 &&
+                          activeProduct.sku==sku && 
+                          activeProduct.pv==pv && 
+                          activeProduct.category.id==categoryId 
+                        )
+                       }
                     type="submit" 
                     style={isHired}
                     color='primary' sx={{padding:2}}>
                         <SaveOutlined sx={{fontSize: 30, mr:1}}/>
-                        Guardar
+                        Save
                 </Button>
             </Grid>    
         </Grid>
@@ -281,7 +298,7 @@ export const NewEditViewProduct = () => {
                             error={!!skuValid && formSubmitted /*Casilla roja por error*/}
                             helperText={skuValid /*Texto error bajo la casilla*/}
                             required
-                            inputProps={isReadOnly}
+                            inputProps={quoterProcess=='edit' ?{ readOnly: true } :{ readOnly: false }}
                             />
                     </Grid>
 

@@ -18,7 +18,7 @@ export const temporalQuoterToNewQuoter = async (activeQuoter, products, skuToDel
             }
         });
 
-        const newQuoterActive={
+        const newQuoterActive={ 
             ...activeQuoter,
             products: products2,
             total: totalValue,

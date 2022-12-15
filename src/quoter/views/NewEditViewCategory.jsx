@@ -1,5 +1,5 @@
 import { SaveOutlined, SignalCellularNull, } from "@mui/icons-material"
-import { Grid, Select, TextField, Typography, MenuItem, InputLabel } from "@mui/material"
+import { Grid, Select, TextField, Typography, MenuItem, InputLabel, Button } from "@mui/material"
 import { ImageGallery } from "../components/imageGallery"
 
 import Box from '@mui/material/Box';
@@ -8,11 +8,11 @@ import { useForm } from "../../hooks/useForm";
 import { useEffect, useState } from "react";
 import { startCreateCategory, startUpdateCategory } from "../../store/quoter/thunks";
 import Swal from 'sweetalert2'
-import { setIsSaving } from "../../store/quoter/quoterSlice";
+//import { setIsSaving } from "../../store/quoter/quoterSlice";
 
 export const NewEditViewCategory = () => {
     
-    const{errorMessage, categories, activeCategory,
+    const{errorMessage, successMessage, activeCategory,
         statusQuoter, quoterProcess, }= useSelector(state=> state.quoter)
 
     const{user}= useSelector(state=> state.auth)
@@ -30,7 +30,7 @@ export const NewEditViewCategory = () => {
     const onClickSaveCategory = (event) =>{
         event.preventDefault();
         setFormSubmitted(true);
-        dispatch(setIsSaving(true));        
+        //dispatch(setIsSaving(true));        
         quoterProcess==='edit'
             ? dispatch(startUpdateCategory(formState))      
             : dispatch(startCreateCategory(formState));
@@ -39,9 +39,14 @@ export const NewEditViewCategory = () => {
     useEffect(()=>{
         console.log('errorMessage en useEffect ',errorMessage)
         if(errorMessage!== undefined && errorMessage!== null){
-          Swal.fire('Ocurrió un error', errorMessage, 'error')
+          Swal.fire('Error', errorMessage, 'error')
         }
       },[errorMessage])
+
+    useEffect(()=>{
+        if(successMessage)
+            Swal.fire({icon: 'success', title: successMessage, showConfirmButton: false, timer: 1500})
+    }),[successMessage]
         
     useEffect(()=>{
         onResetForm()
@@ -58,14 +63,15 @@ export const NewEditViewCategory = () => {
                 <Typography fontSize={39} fontWeight='light'> {user.rol=='user' ? 'View' :quoterProcess} Category</Typography>
             </Grid>
             <Grid item>
-                <button 
-                disabled={statusQuoter=='communicating'}
+                <Button 
+                disabled={statusQuoter=='communicating'||
+                (activeCategory.title==title && activeCategory.description==description)}
                 type="submit" 
                 style={isHired}
                 color='primary' sx={{padding:2}}>
                     <SaveOutlined sx={{fontSize: 30, mr:1}}/>
-                    Guardar
-                </button>
+                    Save
+                </Button>
             </Grid>    
         </Grid>
 

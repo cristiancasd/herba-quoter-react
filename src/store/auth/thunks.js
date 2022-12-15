@@ -23,13 +23,25 @@ export const startLoginWithEmailPassword = ({email, password}) => {
             })); 
         
         }catch(error){
-            console.log('error en autenticación login usuario y contraseña', error)
-            error.response.status==401
-                ? dispatch(onLogout('Invalid Credentials'))
-                : dispatch(onLogout(error.response.data.message.toString()));
+
+            const errorMesage=existError(error);
+            dispatch(onLogout(errorMesage))
             setTimeout(()=>{
                 dispatch(clearErrorMessage());
             },10);
+
+           /* if(error.response){
+                console.log('error en autenticación login usuario y contraseña', error);
+                error.response.status==401
+                    ? dispatch(onLogout('Invalid Credentials'))
+                    : dispatch(onLogout(error.response.data.message.toString()));
+
+            }else{
+                dispatch(onLogout('Networwk Error'))
+            }
+            setTimeout(()=>{
+                dispatch(clearErrorMessage());
+            },10); */
         }
     }       
 }
@@ -52,13 +64,22 @@ export const startRegisterWithEmailPassword = (userNewData) => {
             dispatch(onLogin({name: user.fullname, id: user.id, rol: user.rol, email: user.email, herbalifeLevel: user.herbalifelevel, country: user.country
             }));
         }catch(error){
-            console.log('error register ', error);   
+            
+            const errorMesage=existError(error, userNewDataBackend.email);
+            dispatch(onLogout(errorMesage))
+            setTimeout(()=>{
+                dispatch(clearErrorMessage());
+            },10);
+            
+
+
+            /*console.log('error register ', error);   
             (error.response.data.message.length===1)
                 ? dispatch(onLogout(error.response.data.message[0]))
                 : dispatch(onLogout(`The email ${userNewDataBackend.email} already exists`));
             setTimeout(()=>{
                 dispatch(clearErrorMessage());
-            },10);
+            },10);*/
         }
     }       
 }
@@ -102,4 +123,13 @@ export const startLogout = () => {
         localStorage.clear();
         dispatch(onLogout());
     }    
+}
+
+const existError=(error,email='')=>{
+    console.log('error register ', error); 
+    return error.response
+        ? error.response.status==401
+            ? 'Invalid Credentials'
+            : `The email ${email} already exists`
+        : 'Networwk Error'
 }

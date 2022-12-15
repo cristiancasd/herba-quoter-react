@@ -1,4 +1,4 @@
-import { DeleteOutline, SaveOutlined, SignalCellularNull, Update, UploadOutlined, } from "@mui/icons-material"
+import { AddShoppingCartOutlined, DeleteOutline, SaveOutlined, SignalCellularNull, Update, UploadOutlined, } from "@mui/icons-material"
 import { Grid, Select, TextField, Typography, MenuItem, InputLabel, Button, 
     TableContainer, Table, TableHead, TableCell, TableRow, TableBody, DialogContent, DialogContentText, Dialog, DialogTitle, Divider } from "@mui/material"
 import Paper from '@mui/material/Paper';
@@ -9,10 +9,12 @@ import { ImageGallery } from "../components/imageGallery"
 import Box from '@mui/material/Box';
 import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "../../hooks/useForm";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { startCreateProduct, startCreateQuoter, startUpdateProduct, startUpdateQuoter, startUploadingFiles } from "../../store/quoter/thunks";
+import { useEffect,  useRef, useState } from "react";
+import { startCreateQuoter,  startUpdateQuoter, startUploadingFiles } from "../../store/quoter/thunks";
 import Swal from 'sweetalert2'
-import { communicatingBackend, resetTemporalQuoter, setActiveQuoter, setDeleteQuoterProduct, setIsAddProductQuoterProcess, setIsSaving, setTemporalQuoter } from "../../store/quoter/quoterSlice";
+import { communicatingBackend, 
+  //resetTemporalQuoter, setTemporalQuoter,
+  setActiveQuoter, setDeleteQuoterProduct, setIsAddProductQuoterProcess,  } from "../../store/quoter/quoterSlice";
 import { temporalQuoterToNewQuoter } from "../../helpers/temporalQuoterToNewQuoter";
 
 function createData(productSku, title, quantity, unitPrice, total) {
@@ -26,8 +28,10 @@ const formValidations={
 
 export const NewEditViewQuoter = () => {
 
-    const{errorMessage, statusQuoter, quoterProcess,
-        activeQuoter, activeQuoterToEdit, temporalQuoter, products, isScreenCel, quoters
+    const{errorMessage, successMessage, statusQuoter, quoterProcess,
+        activeQuoter, activeQuoterToEdit, 
+        //temporalQuoter, 
+        products, isScreenCel, quoters
      }= useSelector(state=> state.quoter)
 
     const {title, description, formState, isFormValid, titleValid,
@@ -39,45 +43,51 @@ export const NewEditViewQuoter = () => {
     let claves = Object.keys(activeQuoter.products); 
     
     const [productsQuoter, setProductsQuoter] = useState(activeQuoter.products);
-    const [initalQuoter, setInitialQuoter] = useState({}) ;
+    
+    //set original products before quoter updated
     useEffect(() => {
-      const activeProductBeforeSaveUpdate = quoters.find(element => element.id == activeQuoter.id);
-      setProductsQuoter(activeProductBeforeSaveUpdate.products)
-    }, [])
+      if(quoterProcess=='edit'){const activeProductBeforeSaveUpdate = quoters.find(element => element.id == activeQuoter.id);
+      setProductsQuoter(activeProductBeforeSaveUpdate.products)}
+    }, []) 
+    
+    // set Products quoter when a new quoter is selected
+    useEffect(() => {
+      if(activeQuoter.title != title)setProductsQuoter(activeQuoter.products)
+    }, [activeQuoter.title])
     
 
-
-
+    // Temporal quoter table
     const [rows, setRows]=useState([])
-   useEffect(() => {
-    let rowsTemporal=[]
+    useEffect(() => {
+      let rowsTemporal=[]
 
-    for(let i=0; i< claves.length; i++){
-        let productSku = claves[i];
-        rowsTemporal.push(
-         createData(
-                productSku,
-                activeQuoter.products[productSku].title, 
-                activeQuoter.products[productSku].quantity,
-                activeQuoter.products[productSku].unitPrice,
-                activeQuoter.products[productSku].total
-            )
-        
-        )
-    }
-    setRows(rowsTemporal)
-    
-   }, [activeQuoter])
+      for(let i=0; i< claves.length; i++){
+          let productSku = claves[i];
+          rowsTemporal.push(
+          createData(
+                  productSku,
+                  activeQuoter.products[productSku].title, 
+                  activeQuoter.products[productSku].quantity,
+                  activeQuoter.products[productSku].unitPrice,
+                  activeQuoter.products[productSku].total
+              )
+          
+          )
+      }
+      
+      setRows(rowsTemporal)
+      
+    }, [activeQuoter])
+   
    
     const [formSubmitted, setFormSubmitted] = useState(false);
-
     const onClickSaveQuoter = (event) =>{
         event.preventDefault();
-        dispatch(setIsSaving(true));
+        //dispatch(setIsSaving(true));
         setFormSubmitted(true); //Cambiamos estado
         let err='';
         if(titleValid) err=' -'+titleValid;
-        if(err!=='')Swal.fire('Llena correctamente el formulario', err, 'error');
+        if(err!=='')Swal.fire('Formulary incorrect', err, 'error');
         if(!isFormValid) return;
         quoterProcess==='edit'
           ? dispatch(startUpdateQuoter({...activeQuoter, title, description}))        
@@ -93,16 +103,22 @@ export const NewEditViewQuoter = () => {
     }
 
     useEffect(()=>{
-        console.log('errorMessage en useEffect ',errorMessage)
-        if(errorMessage!== undefined && errorMessage!== null){
-          Swal.fire('Ocurrió un error', errorMessage, 'error')
-        }
+        if(errorMessage!== undefined && errorMessage!== null)
+          Swal.fire('Error', errorMessage, 'error')
       },[errorMessage])
-        
+
+    useEffect(()=>{
+      if(successMessage)
+        Swal.fire({icon: 'success',title: successMessage, showConfirmButton: false,timer: 1500})
+    }),[successMessage]
+      
+    // reset form and 
     useEffect(()=>{
         onResetForm()
+        //if(quoterProcess=='create') dispatch(resetTemporalQuoter({}))  
       },[quoterProcess])
 
+    
     const onFileInputChange=({target})=>{
 
         if(target.files===0)   return; 
@@ -111,15 +127,14 @@ export const NewEditViewQuoter = () => {
             //dispatch(startUploadingFiles(target.files,activeProduct,))
     }
 
-
     const addNewProductsToQuoter=()=>{ 
       dispatch(setIsAddProductQuoterProcess(true))
     }
 
-    useEffect(() => {
+    /*useEffect(() => {
       if(quoterProcess=='create')
       dispatch(resetTemporalQuoter({}))  
-    }, [quoterProcess])
+    }, [quoterProcess])*/
 
 
   return (
@@ -160,7 +175,7 @@ export const NewEditViewQuoter = () => {
                       type="submit" 
                       color='primary' sx={{padding:2}}>
                           <SaveOutlined sx={{fontSize: 30, mr:1}}/>
-                          Guardar
+                          Save
                   </Button>
               </Grid>    
           </Grid>
@@ -179,8 +194,8 @@ export const NewEditViewQuoter = () => {
           onClick={addNewProductsToQuoter}
           color='primary' 
           sx={{marginBottom:2}}>
-            <Update sx={{fontSize: 30, mr:1}}/>
-            Add Product
+            <AddShoppingCartOutlined sx={{fontSize: 24, mr:1}}/>
+            Products
         </Button>
       
         <Paper sx={{ width: '100%', overflow: 'hidden' }}>
