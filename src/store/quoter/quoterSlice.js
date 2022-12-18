@@ -1,68 +1,4 @@
 import { createSlice } from "@reduxjs/toolkit";
-const tempUser={
-    id: 'erewrewr',
-    fullname:'carlos eduardo'
-}
-const tempCategory = {
-    id: '32432423',
-    title: 'proteínas',
-    description: 'Salud Muscular',  
-    user:tempUser,
-}
-const tempCategory2 = {
-    id: '32432424',
-    title: 'Digestivos',
-    description: 'salud digestiva',
-    user:tempUser,
-}
-const tempProduct =   {
-    id: '000',
-    title: 'PDM',
-    pricepublic: 0,
-    price15: 0,
-    price25: 0,
-    price35: 0,
-    price42: 0,
-    price50: 0,
-    pv: 34.95,
-    sku: 'SAD',
-    image:'https://img.wattpad.com/d2c55dcd8f4e72fa33e8494e7aba4ebe1817a566/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f776174747061642d6d656469612d736572766963652f53746f7279496d6167652f6c71664d796c47764c64447668413d3d2d3333303437393730372e313438343330633166643337643561323433383030333131313432382e706e67?s=fit&w=720&h=720',
-    description: 'Full saludable',
-    user:tempUser,
-    category: tempCategory
-};
-const tempProduct2 =   {
-    id: '111',
-    title: 'rebuild',
-    pricepublic: 0,
-    price15: 0,
-    price25: 0,
-    price35: 0,
-    price42: 0,
-    price50: 0,
-    pv: 34.95,
-    sku: 'SAD',
-    image:'https://storage.gra.cloud.ovh.net/v1/AUTH_296c7803aa594af69d39b970927c8fb9/media/avatars/ZO/ZOTgUANIPkhZeU81.jpeg',
-    description: 'Full saludable',
-    user:tempUser,
-    category: tempCategory
-};
-const tempProduct3 =   {
-    id: '2222',
-    title: 'aloe',
-    pricepublic: 0,
-    price15: 0,
-    price25: 0,
-    price35: 0,
-    price42: 0,
-    price50: 0,
-    pv: 34.95,
-    sku: 'SAD',
-    image:'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQFXIs-bmBdr7REAvqq3aZMYiudg0v27L0EXA&usqp=CAU',
-    description: 'Full saludable',
-    user:tempUser,
-    category: tempCategory2
-};
 
 const activeQuoterExample={
     id:'123',
@@ -112,9 +48,7 @@ const activeQuoterExample2={
         },
     },
     total:277000+79000,
-    pv: 52.1+14.75,
-    
-    
+    pv: 52.1+14.75,  
 }
 
 export const quoterSlice = createSlice({
@@ -132,13 +66,14 @@ export const quoterSlice = createSlice({
         statusQuoter:'communicating',
         productsLoaded: null,
         categoriesLoaded: null,
-        quoterProcess: 'edit',
+        quoterProcess: 'View',
         errorMessage: undefined,
         successMessage: undefined,
-        //isSaving: false,
         mobileOpen: false,
         isScreenCel: false,
         selection:'product',
+
+        priceDiscountQuoter:'pricepublic',
 
 
         isAddProductQuoterProcess: false,
@@ -220,7 +155,7 @@ export const quoterSlice = createSlice({
         },
 
         setActiveProduct: ( state, { payload } ) => {
-            state.quoterProcess= 'edit';
+            state.quoterProcess= 'View';
             state.statusQuoter='ok';
             state.selection='product';
             state.activeProduct=payload;
@@ -236,7 +171,7 @@ export const quoterSlice = createSlice({
         },
 
         setActiveCategory: ( state, { payload } ) => {
-            state.quoterProcess= 'edit';
+            state.quoterProcess= 'View';
             state.statusQuoter='ok';
             state.selection='category';
             //state.activeProduct={};
@@ -252,9 +187,7 @@ export const quoterSlice = createSlice({
             //state: ok, communicating
             payload
                 ? state.statusQuoter='communicating'
-                : state.statusQuoter='ok'
-            //state.errorMessage=undefined;
-            
+                : state.statusQuoter='ok'            
         },
 
         onErrorMessage: (state, {payload})=>{
@@ -271,11 +204,6 @@ export const quoterSlice = createSlice({
             state.successMessage= undefined;
         },
 
-
-
-        /*setIsSaving: (state, {payload})=>{
-            state.isSaving=payload;
-        },*/
         handleMobileOpen: (state, {payload})=>{
             console.log('estoy en handleMobileOpen ')
             state.mobileOpen= payload
@@ -297,11 +225,7 @@ export const quoterSlice = createSlice({
         
         setActiveQuoter:(state, {payload})=>{
             console.log('estoy en setActiveQuoter');
-            //state.quoterProcess= 'edit';
             state.activeQuoter=payload
-           // (payload=='') 
-             //   ? state.activeQuoter=undefined
-               // : state.activeQuoter=payload
             console.log('activeQuote es ', state.activeQuoter)
         },
         setActiveQuoterToEdit:(state, {payload})=>{
@@ -320,10 +244,6 @@ export const quoterSlice = createSlice({
                 : delete state.activeQuoter.products[sku];
         }, 
 
-        /*resetTemporalQuoter:(state)=>{
-            console.log('estoy en resetTemporalQuoter ,')
-            state.temporalQuoter={}
-        },*/
 
         onUpdateQuoter: ( state, { payload } ) => {
             state.quoters = state.quoters.map( quoter => {
@@ -347,6 +267,12 @@ export const quoterSlice = createSlice({
             state.activeQuoter=payload,
             state.activeQuoterToEdit={title: payload.title, description: payload.description}
         },
+
+        setPriceDiscountQuoter: (state, {payload}) => {
+            state.priceDiscountQuoter= payload
+        },
+
+        
     },
 })
 
@@ -368,7 +294,6 @@ export const {
     onUpdateCategory,
     onAddNewProduct,
     onAddNewCategory,
-    //setIsSaving,
     handleMobileOpen,
     setScreenCel,
     setActiveCategoryToAdd, 
@@ -379,6 +304,8 @@ export const {
     setProductsActiveQuoter,
     //resetTemporalQuoter,
     onUpdateQuoter,
-    onCreateQuoter
+    onCreateQuoter,
+
+    setPriceDiscountQuoter,
 
  } = quoterSlice.actions

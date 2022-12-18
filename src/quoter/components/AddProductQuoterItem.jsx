@@ -5,48 +5,40 @@ import { setProductsActiveQuoter } from "../../store/quoter/quoterSlice";
 
 export const AddProductQuoterItem=(product)=> {
 
-    const {activeQuoter}=useSelector(state=> state.quoter);
+    const {activeQuoter, priceDiscountQuoter}=useSelector(state=> state.quoter);
     
     
     const dispatch = useDispatch();
     const [counter, setCounter]= useState(activeQuoter.products[product.sku] ? activeQuoter.products[product.sku].quantity : '0' );
-
     const onInputChange=({target})=>{
-
         let newValue= +target.value>=0 || target.value==''
             ? (target.value) 
             : (0)
-        
-            
         if(newValue!=counter){            
-            
             console.log('newValue en el condicional', newValue);
-
             if(newValue!='') newValue= (+newValue).toFixed()
-            const total= +newValue*product.pricepublic ;
+            const total= +newValue*product[priceDiscountQuoter] ;
             dispatch(setProductsActiveQuoter({sku:product.sku, quantity:+newValue, total }));
             setCounter(newValue)   
         }
     }
 
     const counterChange=async (operation)=>{
+        console.log('estoy en counterChange ', product)
+        console.log('---------------')
 
         const newValue= operation=='increment'
             ? (+counter+1)
             : (counter>0 ? +counter-1 : 0);
-
         if(newValue!=counter){
-           
-            const total= +newValue*product.pricepublic 
+            const total= +newValue*product[priceDiscountQuoter]
+            console.log('activeQuoter antes del dispatch ', activeQuoter)
             dispatch(setProductsActiveQuoter({sku:product.sku, quantity:newValue, total}))
             setCounter(newValue);
+            console.log('activeQuoter Despues del dispatch ', activeQuoter)
         }
     }
 
-    
-
-
-    
     return(
         <>
         <ListItem  disablePadding>
@@ -65,14 +57,14 @@ export const AddProductQuoterItem=(product)=> {
                         {product.description}
                     </Typography> 
                     <Typography variant='h12' noWrap component='div'>
-                        Precio: $ {product.pricepublic.toLocaleString('es-CO')}
+                        Precio: $ {product[priceDiscountQuoter].toLocaleString('es-CO')}
                     </Typography> 
                     <Typography variant='h20' noWrap component='div'>
                         PV: {product.pv}
                     </Typography> 
                     </Grid>
                 
-                <Grid  item xs={4} md={4}   sx={{maxHeight:'40px'}}>
+                <Grid  item xs={5} md={4}   sx={{maxHeight:'40px'}}>
                     <Stack direction="row" spacing={1} >
                             <Button 
                             variant='contained' 

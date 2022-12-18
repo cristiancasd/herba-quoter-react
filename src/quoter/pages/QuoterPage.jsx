@@ -23,6 +23,7 @@ export const QuoterPage = () => {
 
   useEffect(() => {
     dispatch(setActiveQuoter(quoters[0]))
+    dispatch(setQuoterProcess('Edit'))
   }, [])
 
   const startCreate=()=>{
@@ -38,7 +39,7 @@ export const QuoterPage = () => {
       dispatch(setActiveQuoter(quoterReset));
       dispatch(setActiveQuoterToEdit({title:'', description:''}));
     }
-    dispatch(setQuoterProcess('create'));
+    dispatch(setQuoterProcess('Create'));
   } 
 
 
@@ -60,7 +61,7 @@ export const QuoterPage = () => {
       
       
       <IconButton
-        disabled={quoterProcess=='create'}
+        disabled={quoterProcess=='Create'}
         style={isHired}
         onClick={startCreate}
         size='large'

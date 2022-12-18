@@ -19,7 +19,7 @@ export const ProductCategoryPage = () => {
   const isHired = user.rol=='user' ?{ display: 'none' } :{ display: '' }
 
   const startCreate=()=>{ 
-    dispatch(setQuoterProcess('create'));
+    dispatch(setQuoterProcess('Create'));
     
     if(activeProduct){
       const productReset =   {
@@ -66,7 +66,7 @@ export const ProductCategoryPage = () => {
       } 
       
       <IconButton
-        disabled={quoterProcess=='create'}
+        disabled={quoterProcess=='Create'}
         style={isHired}
         onClick={startCreate}
         size='large'

@@ -2,7 +2,7 @@ import { TurnedInNot , Stars, StartSharp, ArrowBack, StarOutlineOutlined, Calcul
 import { Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Toolbar,  } from '@mui/material'
 import React, { useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux/es/exports'
-import { handleMobileOpen,  setActiveQuoterToEdit, setActiveQuoter, setIsAddProductQuoterProcess} from '../../store/quoter/quoterSlice'
+import { handleMobileOpen,  setActiveQuoterToEdit, setActiveQuoter, setIsAddProductQuoterProcess, setQuoterProcess} from '../../store/quoter/quoterSlice'
 
 
 export const SideBarItemQuoters = (quoter) => {
@@ -29,6 +29,7 @@ export const SideBarItemQuoters = (quoter) => {
       dispatch(setActiveQuoter(quoter))
       dispatch(setActiveQuoterToEdit({title:quoter.title, description:quoter.description}))
       dispatch(setIsAddProductQuoterProcess(false))
+      dispatch(setQuoterProcess('Edit'))
       if(isScreenCel) dispatch(handleMobileOpen(!mobileOpen));
     }
 

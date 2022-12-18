@@ -1,6 +1,5 @@
-import { SaveOutlined, SignalCellularNull, } from "@mui/icons-material"
-import { Grid, Select, TextField, Typography, MenuItem, InputLabel, Button } from "@mui/material"
-import { ImageGallery } from "../components/imageGallery"
+import { BorderColorOutlined, SaveOutlined, SignalCellularNull, } from "@mui/icons-material"
+import { Grid, TextField, Typography, MenuItem, InputLabel, Button } from "@mui/material"
 
 import Box from '@mui/material/Box';
 import { useDispatch, useSelector } from "react-redux";
@@ -8,7 +7,7 @@ import { useForm } from "../../hooks/useForm";
 import { useEffect, useState } from "react";
 import { startCreateCategory, startUpdateCategory } from "../../store/quoter/thunks";
 import Swal from 'sweetalert2'
-//import { setIsSaving } from "../../store/quoter/quoterSlice";
+import { setQuoterProcess } from "../../store/quoter/quoterSlice";
 
 export const NewEditViewCategory = () => {
     
@@ -16,8 +15,8 @@ export const NewEditViewCategory = () => {
         statusQuoter, quoterProcess, }= useSelector(state=> state.quoter)
 
     const{user}= useSelector(state=> state.auth)
-    const isReadOnly =user.rol=='user' ?{ readOnly: true } :{ readOnly: false }
-    const isHired = user.rol=='user' ?{ display: 'none' } :{ display: '' }
+    const isReadOnly =user.rol=='user' || quoterProcess==='View' ?{ readOnly: true } :{ readOnly: false }
+    const isHired = user.rol=='user' || quoterProcess==='View' ?{ display: 'none' } :{ display: '' }
 
     const {title, description,  formState, onInputChange, onResetForm} =useForm(activeCategory)
 
@@ -63,6 +62,15 @@ export const NewEditViewCategory = () => {
                 <Typography fontSize={39} fontWeight='light'> {user.rol=='user' ? 'View' :quoterProcess} Category</Typography>
             </Grid>
             <Grid item>
+                <Button
+                    color="primary"
+                    disabled={statusQuoter=='communicating' || quoterProcess=='Create'}
+                    onClick={()=>dispatch(setQuoterProcess('Edit'))}
+                    style={quoterProcess=== 'View' ?{ display: '' } : { display: 'none' } }
+                >
+                    <BorderColorOutlined sx={{fontSize: 30, mr:1}}/>
+                    Edit Category
+                </Button>
                 <Button 
                 disabled={statusQuoter=='communicating'||
                 (activeCategory.title==title && activeCategory.description==description)}

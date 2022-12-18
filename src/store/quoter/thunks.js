@@ -124,7 +124,7 @@ export const startCreateProduct=(product)=>{
             const {user, category, ...resto }=data;
             dispatch(setActiveProductToEdit({...resto, categoryId:category.id})) 
             dispatch(onAddNewProduct(data))
-            dispatch(setQuoterProcess('edit'));  
+            dispatch(setQuoterProcess('View'));  
             //dispatch(setActiveProduct(data))
             dispatch(onSuccessMessage('Product created'));
             setTimeout(()=>{
@@ -159,7 +159,7 @@ export const startCreateCategory=(category)=>{
             const {data} = await quoterApi.post('/categories', category);
             dispatch(setActiveCategory(data));
             dispatch(onAddNewCategory(data))
-            dispatch(setQuoterProcess('edit'));
+            dispatch(setQuoterProcess('View'));
             dispatch(onSuccessMessage('Category created'));
             setTimeout(()=>{
                 dispatch(clearSuccessMessage());
@@ -190,7 +190,7 @@ export const startCreateQuoter=(quoter)=>{
     return async(dispatch) =>{
         dispatch(communicatingBackend(true))
         dispatch(onCreateQuoter(quoter))
-        dispatch(setQuoterProcess('edit'));
+        dispatch(setQuoterProcess('View'));
         dispatch(communicatingBackend(false));  
         dispatch(onSuccessMessage('Quoter created'));
             setTimeout(()=>{
@@ -203,7 +203,7 @@ export const startUpdateQuoter=(quoter)=>{
     return async(dispatch) =>{
         dispatch(communicatingBackend(true))
         dispatch(onUpdateQuoter(quoter))
-        dispatch(setQuoterProcess('edit'));
+        dispatch(setQuoterProcess('View'));
         dispatch(communicatingBackend(false));  
         dispatch(onSuccessMessage('Quoter Updated'));
         setTimeout(()=>{

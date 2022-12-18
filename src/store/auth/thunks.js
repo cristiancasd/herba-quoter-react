@@ -130,6 +130,6 @@ const existError=(error,email='')=>{
     return error.response
         ? error.response.status==401
             ? 'Invalid Credentials'
-            : `The email ${email} already exists`
+            : error.response.data.message.toString()
         : 'Networwk Error'
 }

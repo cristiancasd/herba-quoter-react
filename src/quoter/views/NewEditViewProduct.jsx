@@ -1,4 +1,4 @@
-import { SaveOutlined, SignalCellularNull, UploadOutlined, } from "@mui/icons-material"
+import { BorderColorOutlined, SaveOutlined, SignalCellularNull, UploadOutlined, } from "@mui/icons-material"
 import { Grid, Select, TextField, Typography, MenuItem, InputLabel, Button } from "@mui/material"
 import { ImageGallery } from "../components/imageGallery"
 
@@ -8,6 +8,7 @@ import { useForm } from "../../hooks/useForm";
 import { useEffect, useRef, useState } from "react";
 import { startCreateProduct, startUpdateProduct, startUploadingFiles } from "../../store/quoter/thunks";
 import Swal from 'sweetalert2'
+import { setQuoterProcess } from "../../store/quoter/quoterSlice";
 //import { communicatingBackend, setIsSaving } from "../../store/quoter/quoterSlice";
 
 
@@ -23,8 +24,8 @@ export const NewEditViewProduct = () => {
         statusQuoter, quoterProcess, successMessage }= useSelector(state=> state.quoter)
 
     const{user}= useSelector(state=> state.auth)
-    const isReadOnly =user.rol=='user' ?{ readOnly: true } :{ readOnly: false }
-    const isHired = user.rol=='user' ?{ display: 'none' } :{ display: '' }
+    const isReadOnly = user.rol=='user' || quoterProcess=== 'View'?{ readOnly: true } :{ readOnly: false }
+    const isHired = user.rol=='user' || quoterProcess=== 'View' ?{ display: 'none' } :{ display: '' }
 
     const {title, description, pv,sku, image,
     pricepublic, price15, price25, categoryId,
@@ -39,21 +40,19 @@ export const NewEditViewProduct = () => {
     // Variable para saber si el formulario ya fue submitted
     const [formSubmitted, setFormSubmitted] = useState(false)
 
+ 
 
     const onClickSaveProduct = (event) =>{
         event.preventDefault();
-        //dispatch(setIsSaving(true));
         setFormSubmitted(true); //Cambiamos estado
         let err='';
         if(skuValid) err=' -'+skuValid;
         if(titleValid) err= err+' -'+titleValid;
         if(err!=='')Swal.fire('Formulary incorrect', err, 'error');
         if(!isFormValid) return;
-        quoterProcess==='edit'
+        quoterProcess==='Edit'
             ? dispatch(startUpdateProduct(formState, activeProduct.category))        
-            : dispatch(startCreateProduct(formState));
-        
-
+            : dispatch(startCreateProduct(formState)); 
     }
 
     useEffect(()=>{
@@ -85,6 +84,18 @@ export const NewEditViewProduct = () => {
                 <Typography fontSize={39} fontWeight='light'> {user.rol=='user' ? 'View' :quoterProcess} Product</Typography>
             </Grid>
             <Grid item>
+
+                <Button
+                    color="primary"
+                    disabled={statusQuoter=='communicating' || quoterProcess=='Create'}
+                    onClick={()=>dispatch(setQuoterProcess('Edit'))}
+                    style={quoterProcess=== 'View' ?{ display: '' } : { display: 'none' } }
+                >
+                    <BorderColorOutlined sx={{fontSize: 30, mr:1}}/>
+                    Edit Product
+                </Button>
+
+
                 <input
                     type="file"
                     multiple
@@ -92,9 +103,10 @@ export const NewEditViewProduct = () => {
                     onChange={onFileInputChange}
                     style={{display:'none'}}
                     />
+
                 <Button
                     color="primary"
-                    disabled={statusQuoter=='communicating' || quoterProcess=='create'}
+                    disabled={statusQuoter=='communicating' || quoterProcess=='Create'}
                     onClick={()=>fileInputRef.current.click()}
                     style={isHired}
                 >
@@ -179,8 +191,8 @@ export const NewEditViewProduct = () => {
                         onChange={onInputChange}
                         type='number'
                         variant='filled'
-                        fullWidth   
-                        value={pricepublic}             
+                        fullWidth
+                        value={quoterProcess==='View'? pricepublic.toLocaleString('es-CO') :pricepublic}             
                         placeholder="Precio Público"
                         label='Precio Público'
                         sx={{border:'none', mb:1}}
@@ -196,7 +208,7 @@ export const NewEditViewProduct = () => {
                         fullWidth 
                         name="price15"
                         onChange={onInputChange}
-                        value={price15}                
+                        value={quoterProcess==='View'? price15.toLocaleString('es-CO') :price15}             
                         placeholder="Precio 15%"
                         label='Precio 15%'
                         sx={{border:'none', mb:1}}
@@ -212,7 +224,7 @@ export const NewEditViewProduct = () => {
                             fullWidth 
                             name="price25"
                             onChange={onInputChange}
-                            value={price25}                
+                            value={quoterProcess==='View'? price25.toLocaleString('es-CO') :price25}             
                             placeholder="Precio 25%"
                             label='Precio 25%'
                             sx={{border:'none', mb:1}}
@@ -228,7 +240,7 @@ export const NewEditViewProduct = () => {
                             fullWidth   
                             name="price35"
                             onChange={onInputChange}
-                            value={price35}              
+                            value={quoterProcess==='View'? price35.toLocaleString('es-CO') :price35}             
                             placeholder="Precio 35%"
                             label='Precio 35%'
                             sx={{border:'none', mb:1}}
@@ -244,7 +256,7 @@ export const NewEditViewProduct = () => {
                             fullWidth   
                             name="price42"
                             onChange={onInputChange} 
-                            value={price42}             
+                            value={quoterProcess==='View'? price42.toLocaleString('es-CO') :price42}                        
                             placeholder="Precio 42%"
                             label='Precio 42%'
                             sx={{border:'none', mb:1}}
@@ -260,7 +272,7 @@ export const NewEditViewProduct = () => {
                             fullWidth   
                             name="price50"
                             onChange={onInputChange}
-                            value={price50}              
+                            value={quoterProcess==='View'? price50.toLocaleString('es-CO') :price50}             
                             placeholder="Precio 50%"
                             label='Precio 50%'
                             sx={{border:'none', mb:1}}
@@ -298,7 +310,7 @@ export const NewEditViewProduct = () => {
                             error={!!skuValid && formSubmitted /*Casilla roja por error*/}
                             helperText={skuValid /*Texto error bajo la casilla*/}
                             required
-                            inputProps={quoterProcess=='edit' ?{ readOnly: true } :{ readOnly: false }}
+                            inputProps={quoterProcess=='Edit' ?{ readOnly: true } :{ readOnly: false }}
                             />
                     </Grid>
 
