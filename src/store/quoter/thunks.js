@@ -6,8 +6,7 @@ import { communicatingBackend, setActiveProductToEdit,
     
     onSuccessMessage, clearSuccessMessage,
     onErrorMessage, clearErrorMessage, 
-       
-      //setIsSaving, 
+
       setQuoterProcess,
       onUpdateQuoter,
       onCreateQuoter,
@@ -17,7 +16,7 @@ import { communicatingBackend, setActiveProductToEdit,
 export const startLoadingProducts=()=>{
     return async(dispatch) =>{
         dispatch(communicatingBackend(true))
-        try{
+        try{ 
             const {data} = await quoterApi.get('/products');
             const {user, isactive, category, ...resto}=data[0];
             const productToEdit={ ...resto, categoryId: category.id};
@@ -27,13 +26,6 @@ export const startLoadingProducts=()=>{
         }catch(error){
             const errorMessage=existError(error, 'loading products ');
             dispatch(onErrorMessage(errorMessage))
-            
-           /* if(error.response.status==404)
-                dispatch(onErrorMessage('No hay productos en la base de datos'));
-
-            if(error.response.status==400)
-                dispatch(onErrorMessage(error.response.data.message.toString()))
-        */
             setTimeout(()=>{
                 dispatch(clearErrorMessage());
             },10);
@@ -77,34 +69,14 @@ export const startUpdateProduct=(product, category)=>{
             const {user, category, ...resto }=productUpdated;
             dispatch(setActiveProductToEdit({...resto, categoryId:category.id}))  
             dispatch(onUpdateProduct(productUpdated));
-            //dispatch(setIsSaving(false));
             dispatch(onSuccessMessage('Product Updated'));
             setTimeout(()=>{
                 dispatch(clearSuccessMessage());
             },10);
 
         }catch(error){
-
             const errorMessage= existError(error,'Product ', `id: ${product.id}`);
             dispatch(onErrorMessage(errorMessage));
-            
-
-            /*if(error.response){
-                if(error.response.status==403)
-                dispatch(onErrorMessage(`no tienes los permisos para hacer esta función`))
-
-                if(error.response.status==404)
-                    dispatch(onErrorMessage(`Producto con id ${product.id} no existe en la base de datos`))
-
-                if(error.response.status==410)
-                    dispatch(onErrorMessage(`Producto con id ${product.id} fue eliminado, hablar con el admin para reestablecerlo`))
-
-                if(error.response.status==400){
-                    dispatch(onErrorMessage(error.response.data.message.toString()))                
-                }
-            }else{
-                dispatch(onErrorMessage('error de conexión')) 
-            } */
             setTimeout(()=>{
                 dispatch(clearErrorMessage());
             },10);
@@ -125,7 +97,6 @@ export const startCreateProduct=(product)=>{
             dispatch(setActiveProductToEdit({...resto, categoryId:category.id})) 
             dispatch(onAddNewProduct(data))
             dispatch(setQuoterProcess('View'));  
-            //dispatch(setActiveProduct(data))
             dispatch(onSuccessMessage('Product created'));
             setTimeout(()=>{
                 dispatch(clearSuccessMessage());
@@ -136,14 +107,6 @@ export const startCreateProduct=(product)=>{
             console.log('onErrorMessage ,', errorMessage)
             dispatch(onErrorMessage(errorMessage))
 
-            /*if(error.response.status==410)
-                dispatch(onErrorMessage(`Producto ${product.title} ya existe pero fue eliminado, debes reestablecerlo o usar otro nombre`))
-
-            if(error.response.status==400){
-                dispatch(onErrorMessage(error.response.data.message.toString()))
-            }*/
-
-            
             setTimeout(()=>{
                 dispatch(clearErrorMessage());
             },10);
@@ -164,7 +127,6 @@ export const startCreateCategory=(category)=>{
             setTimeout(()=>{
                 dispatch(clearSuccessMessage());
             },10);
-            //dispatch(setActiveProduct(data))
         }catch(error){
             console.log('error es ', error)
             
@@ -231,20 +193,7 @@ export const startUpdateCategory=(category)=>{
 
             const errorMessage= existError(error, 'category ', `id: ${category.id} `)
             dispatch(onErrorMessage(errorMessage))
-        /*    console.log('error es ', error)
-            if(error.response.status==403)
-                dispatch(onErrorMessage(`no tienes los permisos para hacer esta función`))
-
-            if(error.response.status==404)
-                dispatch(onErrorMessage(`Categoría con id ${category.id} no existe en la base de datos`))
-
-            if(error.response.status==410)
-                dispatch(onErrorMessage(`Categoría con id ${category.id} fue eliminado, hablar con el admin para reestablecerlo`))
-
-            if(error.response.status==400)
-                dispatch(onErrorMessage(error.response.data.message.toString()))
-            
-        */
+        
             setTimeout(()=>{
                 dispatch(clearErrorMessage());
             },10);
@@ -285,39 +234,13 @@ export const startUploadingFiles = (files=[], activeProduct,) => {
         }catch(error){
             const errorMessage=existError(error,'Image ')
             dispatch(onErrorMessage(errorMessage))
-            /*
-            console.log('error subiendo imagen ....', error)
-            if(error.response.status==403)
-                dispatch(onErrorMessage(`no tienes los permisos para hacer esta función`))
 
-            if(error.response.status==404)
-                dispatch(onErrorMessage(`Categoría con id ${category.id} no existe en la base de datos`))
-
-            if(error.response.status==410)
-                dispatch(onErrorMessage(`Categoría con id ${category.id} fue eliminado, hablar con el admin para reestablecerlo`))
-
-            if(error.response.status==400)
-                dispatch(onErrorMessage(error.response.data.message.toString()))
-            */
             setTimeout(()=>{
                 dispatch(clearErrorMessage());
             },10);
         }
-        
-        //const {activeNote} = getState().journal;
-        
-        //const {image}=await fileUpload(files[0])  // Si fuera solo un archivo
-        /* const productoToUpdate {
-            ...setActiveProduct,
-            image
-        }*/
-        
 
-
-
-        //dispatch(setPhotosToActiveNote(imageUrl)); 
         dispatch(communicatingBackend(false));
-
     }
 }
 

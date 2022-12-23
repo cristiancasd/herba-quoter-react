@@ -80,16 +80,22 @@ export const NewEditViewProduct = () => {
     onSubmit={onClickSaveProduct}>
     <Box sx={{ flexGrow: 1 }}>
         <Grid container direction='row' justifyContent='space-between' alignItems='center' sx={{mb:1}} item xs={12}  md={12}>
-            <Grid item>
-                <Typography fontSize={39} fontWeight='light'> {user.rol=='user' ? 'View' :quoterProcess} Product</Typography>
+       
+
+            <Grid item >
+                <Typography fontSize={34} fontWeight='light'> {user.rol=='user' ? 'View' :quoterProcess} Product: </Typography>
+                <Typography fontSize={20} fontWeight='light'> {activeProduct.title} </Typography>
             </Grid>
+           
+            
             <Grid item>
 
                 <Button
                     color="primary"
                     disabled={statusQuoter=='communicating' || quoterProcess=='Create'}
                     onClick={()=>dispatch(setQuoterProcess('Edit'))}
-                    style={quoterProcess=== 'View' ?{ display: '' } : { display: 'none' } }
+                    style={quoterProcess=== 'View' && user.rol !=='user' ?{ display: '' } : { display: 'none' } }
+                    
                 >
                     <BorderColorOutlined sx={{fontSize: 30, mr:1}}/>
                     Edit Product

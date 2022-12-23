@@ -19,7 +19,7 @@ export const QuoterPage = () => {
   const dispatch=useDispatch();
   const { quoterProcess, activeQuoter, quoters, isAddProductQuoterProcess}= useSelector(state=>state.quoter)
   const{user}= useSelector(state=> state.auth)
-  const isHired = user.rol=='user' ?{ display: 'none' } :{ display: '' }
+  const isHired = user.rol=='user'||isAddProductQuoterProcess ?{ display: 'none' } :{ display: '' }
 
   useEffect(() => {
     dispatch(setActiveQuoter(quoters[0]))

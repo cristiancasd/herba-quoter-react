@@ -107,7 +107,7 @@ export const chekAuthToken = () => {
             localStorage.setItem('token', data.token);
             localStorage.setItem('token-init-date', new Date().getTime()); //Hacer manejos de token, calcular cuanto tiempo le queda etc.          
                 dispatch(onLogin({name: user.fullname, id: user.id, rol: user.rol, 
-                email: user.email, herbalifeLevel: user.herbalifelevel, country: user.country}))
+                email: user.email, herbalifeLevel: user.herbalifelevel, country: user.country, image: user.image}))
         }catch(error){
             console.log('hubo error',error)
             localStorage.clear();

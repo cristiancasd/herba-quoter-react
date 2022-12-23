@@ -17,8 +17,13 @@ export const SideBar = ({drawerWidth= 240}) => {
     const { products, categories, productsLoaded, categoriesLoaded, } = useSelector(state => state.quoter) 
 
     useEffect(()=>{ 
-        dispatch(startLoadingCategories())
-        dispatch(startLoadingProducts())        
+        console.log('products and categorues loader ', productsLoaded, categoriesLoaded)
+        if(productsLoaded!=='ok'|| categoriesLoaded!=='ok'){
+            console.log('voy a traer categorias y products')
+            dispatch(startLoadingCategories())
+            dispatch(startLoadingProducts())     
+            console.log('ya terminé traer categorias y products')  
+        }
     },[]);
 
     if(productsLoaded!=='ok'|| categoriesLoaded!=='ok'){
@@ -29,8 +34,6 @@ export const SideBar = ({drawerWidth= 240}) => {
     }
 
 
-
-     
     const variablesDrawer={
         userName: user.name,
         drawerWidth

@@ -15,7 +15,7 @@ import Swal from 'sweetalert2'
 import { setActiveQuoter, setDeleteQuoterProduct, setIsAddProductQuoterProcess, setPriceDiscountQuoter,  } from "../../store/quoter/quoterSlice";
 
 
-import { changePriceDiscountQuoter, temporalQuoterToNewQuoter } from "../../helpers/activeQuoterChanges";
+import { adaptNewActiveQuoter } from "../../helpers/activeQuoterChanges";
 
 
 function createData(productSku, title, quantity, unitPrice, total) {
@@ -103,8 +103,9 @@ export const NewEditViewQuoter = () => {
         setProductsQuoter(activeQuoter.products)
     }
 
-    const deleteProductList=async (event, skuToDelete)=>{                
-        const newQuoterActive= await temporalQuoterToNewQuoter(activeQuoter, products, skuToDelete, priceDiscountQuoter)
+    const deleteProductList=async (event, skuToDelete)=>{ 
+         
+        const newQuoterActive= await adaptNewActiveQuoter({activeQuoter, products, skuToDelete, priceDiscountQuoter});
         dispatch(setActiveQuoter(newQuoterActive));
         console.log('newQuoterActive es ', newQuoterActive)
     }
@@ -137,7 +138,7 @@ export const NewEditViewQuoter = () => {
 
     const selectChange=({target})=>{
       dispatch(setPriceDiscountQuoter(target.value))
-      const newActiveQuoter=changePriceDiscountQuoter(target.value, products, activeQuoter)
+      const newActiveQuoter=adaptNewActiveQuoter({priceDiscountQuoter:target.value, products, activeQuoter})
       dispatch(setActiveQuoter(newActiveQuoter))
     }
 
@@ -150,7 +151,9 @@ export const NewEditViewQuoter = () => {
       <Box sx={{ flexGrow: 1 }}>
           <Grid container direction='row' justifyContent='space-between' alignItems='center' sx={{mb:1}} item xs={12}  md={12}>
               <Grid item>
-                  <Typography fontSize={39} fontWeight='light'> {quoterProcess} Quoter</Typography>
+                  <Typography fontSize={34} fontWeight='light'> {quoterProcess} Quoter</Typography>
+                  <Typography fontSize={20} fontWeight='light'> {activeQuoter.title} </Typography>
+
                   
               </Grid>
               <Grid item>                  

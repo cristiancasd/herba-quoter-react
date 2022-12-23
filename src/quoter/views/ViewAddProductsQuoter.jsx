@@ -2,17 +2,17 @@ import { SaveOutlined, Update } from "@mui/icons-material";
 import { Box, Button, Container, Divider, Grid, List, ListItem, Stack, TextField, Typography,  } from "@mui/material"
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux"
-import { temporalQuoterToNewQuoter } from "../../helpers/activeQuoterChanges";
+import { adaptNewActiveQuoter } from "../../helpers/activeQuoterChanges";
 import { setActiveQuoter, setIsAddProductQuoterProcess } from "../../store/quoter/quoterSlice";
 import { AddProductQuoterItem } from "../components/AddProductQuoterItem";
  
-
+ 
 export const ViewAddProductsQuoter = () => {
-    const{products, activeQuoter}= useSelector(state=> state.quoter);
+    const{products, activeQuoter, priceDiscountQuoter}= useSelector(state=> state.quoter);
     const dispatch=useDispatch()
 
     const updateQuoter=async()=>{
-        const newQuoterActive= await temporalQuoterToNewQuoter(activeQuoter, products)
+        const newQuoterActive= await adaptNewActiveQuoter({activeQuoter, products, priceDiscountQuoter})
         dispatch(setActiveQuoter(newQuoterActive));
         dispatch(setIsAddProductQuoterProcess(false));
     }

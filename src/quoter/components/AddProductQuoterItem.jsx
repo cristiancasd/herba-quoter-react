@@ -10,32 +10,40 @@ export const AddProductQuoterItem=(product)=> {
     
     const dispatch = useDispatch();
     const [counter, setCounter]= useState(activeQuoter.products[product.sku] ? activeQuoter.products[product.sku].quantity : '0' );
+    
     const onInputChange=({target})=>{
         let newValue= +target.value>=0 || target.value==''
             ? (target.value) 
             : (0)
-        if(newValue!=counter){            
-            console.log('newValue en el condicional', newValue);
-            if(newValue!='') newValue= (+newValue).toFixed()
-            const total= +newValue*product[priceDiscountQuoter] ;
-            dispatch(setProductsActiveQuoter({sku:product.sku, quantity:+newValue, total }));
-            setCounter(newValue)   
+        if(newValue!=counter){ 
+            if(+newValue>99){
+                const total= counter*product[priceDiscountQuoter]
+                dispatch(setProductsActiveQuoter({sku:product.sku, quantity:counter, total}))
+                setCounter(counter);
+            }else{
+                if(newValue!='') newValue= (+newValue).toFixed()
+                const total= +newValue*product[priceDiscountQuoter] ;
+                dispatch(setProductsActiveQuoter({sku:product.sku, quantity:+newValue, total }));
+                setCounter(newValue)   
+            }           
         }
     }
 
     const counterChange=async (operation)=>{
-        console.log('estoy en counterChange ', product)
-        console.log('---------------')
 
-        const newValue= operation=='increment'
+        let newValue= operation=='increment'
             ? (+counter+1)
             : (counter>0 ? +counter-1 : 0);
         if(newValue!=counter){
-            const total= +newValue*product[priceDiscountQuoter]
-            console.log('activeQuoter antes del dispatch ', activeQuoter)
-            dispatch(setProductsActiveQuoter({sku:product.sku, quantity:newValue, total}))
-            setCounter(newValue);
-            console.log('activeQuoter Despues del dispatch ', activeQuoter)
+            if(+newValue>99){
+                const total= 99*product[priceDiscountQuoter]
+                dispatch(setProductsActiveQuoter({sku:product.sku, quantity:99, total}))
+                setCounter(99);
+            }else{
+                const total= +newValue*product[priceDiscountQuoter]
+                dispatch(setProductsActiveQuoter({sku:product.sku, quantity:newValue, total}))
+                setCounter(newValue);
+            } 
         }
     }
 
@@ -57,12 +65,12 @@ export const AddProductQuoterItem=(product)=> {
                         {product.description}
                     </Typography> 
                     <Typography variant='h12' noWrap component='div'>
-                        Precio: $ {product[priceDiscountQuoter].toLocaleString('es-CO')}
+                        Price: $ {product[priceDiscountQuoter].toLocaleString('es-CO')}
                     </Typography> 
                     <Typography variant='h20' noWrap component='div'>
                         PV: {product.pv}
                     </Typography> 
-                    </Grid>
+                </Grid>
                 
                 <Grid  item xs={5} md={4}   sx={{maxHeight:'40px'}}>
                     <Stack direction="row" spacing={1} >
@@ -76,10 +84,8 @@ export const AddProductQuoterItem=(product)=> {
 
                             <TextField
                             type='number' 
-                            min='0'
-                            
                             variant='filled'
-                            sx={{minWidth:'40px', minHeight:'30px'}}
+                            sx={{minWidth:'70px', minHeight:'30px', maxWidth:'80px'}}
                             value={counter}
                             margin='dense'
                             size='small'
@@ -94,7 +100,6 @@ export const AddProductQuoterItem=(product)=> {
                             >+</Button>
                     </Stack>
                 </Grid>
-                
             </Grid> 
         </Box>
         

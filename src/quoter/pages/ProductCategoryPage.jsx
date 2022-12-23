@@ -51,6 +51,7 @@ export const ProductCategoryPage = () => {
 
   useEffect(() => {
     dispatch(setActiveQuoter(undefined))
+    dispatch(setQuoterProcess('View'))
   }, [])
   
 
