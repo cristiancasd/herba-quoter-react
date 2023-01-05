@@ -115,7 +115,8 @@ export const NewEditViewQuoter = () => {
     }
 
     const deleteProductList=async (event, skuToDelete)=>{ 
-        const newQuoterActive= await adaptNewActiveQuoter({quoterToShow, products, skuToDelete, priceDiscountQuoter});
+        console.log('AQUIIII *****',{activeQuoter, quoterToShow})
+        const newQuoterActive= await adaptNewActiveQuoter({activeQuoter:quoterToShow, products, skuToDelete, priceDiscountQuoter});
         dispatch(setActiveQuoter(newQuoterActive));
     }
 
@@ -147,7 +148,8 @@ export const NewEditViewQuoter = () => {
 
     const selectChange=({target})=>{
       dispatch(setPriceDiscountQuoter(target.value))
-      const newActiveQuoter=adaptNewActiveQuoter({priceDiscountQuoter:target.value, products, quoterToShow})
+      console.log('AQUIIII *****',{activeQuoter, quoterToShow})
+      const newActiveQuoter=adaptNewActiveQuoter({activeQuoter:quoterToShow,priceDiscountQuoter:target.value, products, quoterToShow})
       dispatch(setActiveQuoter(newActiveQuoter))
     }
 
