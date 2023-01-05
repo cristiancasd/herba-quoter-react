@@ -5,21 +5,17 @@ import { Box } from "@mui/system"
 import { useEffect, useMemo, } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { startLoadingCategories, startLoadingProducts, } from "../../store/quoter/thunks"
-import { SideBarItemCategories } from "./SideBarItemCategories"
-import { SideBarItemProducts } from "./sideBarItemProducts"
 import { DrawerScreenSize } from "./DrawerScreenSize"    
-import { setOrderProducts } from "../../store/quoter/quoterSlice"
 
 export const SideBar = ({drawerWidth= 240}) => {
     
     const dispatch = useDispatch();
     const {user} = useSelector(state => state.auth) 
-    const { products, categories, productsLoaded, categoriesLoaded, } = useSelector(state => state.quoter) 
+    const {  productsLoaded, categoriesLoaded, } = useSelector(state => state.quoter) 
 
     useEffect(()=>{ 
         console.log('products and categorues loader ', productsLoaded, categoriesLoaded)
         if(productsLoaded!=='ok'|| categoriesLoaded!=='ok'){
-            console.log('voy a traer categorias y products')
             dispatch(startLoadingCategories())
             dispatch(startLoadingProducts())     
             console.log('ya terminé traer categorias y products')  
@@ -29,7 +25,7 @@ export const SideBar = ({drawerWidth= 240}) => {
     if(productsLoaded!=='ok'|| categoriesLoaded!=='ok'){
 
         return(
-          <h3>Cargando...</h3>
+          <h3>Upload Side Bar...</h3>
         )
     }
 
@@ -39,7 +35,7 @@ export const SideBar = ({drawerWidth= 240}) => {
         drawerWidth
     }
 
-    console.log('vamos a renderizar')
+    console.log('vamos a renderizar SideBar')
       
   return (
     <Box

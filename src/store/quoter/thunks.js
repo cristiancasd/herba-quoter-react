@@ -3,6 +3,7 @@ import { adapteVariablesToNumber } from "../../helpers/adapteVariablesToNumber";
 import { communicatingBackend, setActiveProductToEdit,
     setActiveProduct, onUpdateProduct,setProducts,onAddNewProduct,
     setActiveCategory, onUpdateCategory,setCategories,onAddNewCategory,
+    setInitialProduct,
     
     onSuccessMessage, clearSuccessMessage,
     onErrorMessage, clearErrorMessage, 
@@ -21,7 +22,7 @@ export const startLoadingProducts=()=>{
             const {user, isactive, category, ...resto}=data[0];
             const productToEdit={ ...resto, categoryId: category.id};
             dispatch(setActiveProductToEdit(productToEdit));
-            dispatch(setActiveProduct(data[0]));
+            dispatch(setInitialProduct(data[0]));
             dispatch(setProducts(data));   
         }catch(error){
             const errorMessage=existError(error, 'loading products ');

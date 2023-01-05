@@ -3,7 +3,7 @@ import { AddOutlined } from "@mui/icons-material"
 import { IconButton, Typography } from "@mui/material"
 import { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { setQuoterProcess, setActiveProductToEdit, setActiveCategoryToAdd, setActiveQuoter } from "../../store/quoter/quoterSlice"
+import { setQuoterProcess, setActiveProductToEdit, setActiveCategoryToAdd, setActiveQuoter, setActiveProduct } from "../../store/quoter/quoterSlice"
 import { QuoterLayout } from "../layout/QuoterLayout"
 import { NewEditViewCategory } from "../views/NewEditViewCategory"
 import { NewEditViewProduct } from "../views/NewEditViewProduct"
@@ -14,7 +14,7 @@ import { NothingSelectedView } from "../views/NothingSelectedView"
 export const ProductCategoryPage = () => {
 
   const dispatch=useDispatch();
-  const { productsLoaded, categoriesLoaded, activeProduct, activeCategory, quoterProcess, selection}= useSelector(state=>state.quoter)
+  const { productsLoaded, categoriesLoaded, activeProduct, activeCategory, quoterProcess, selection, products}= useSelector(state=>state.quoter)
   const{user}= useSelector(state=> state.auth)
   const isHired = user.rol=='user' ?{ display: 'none' } :{ display: '' }
 
@@ -52,6 +52,7 @@ export const ProductCategoryPage = () => {
   useEffect(() => {
     dispatch(setActiveQuoter(undefined))
     dispatch(setQuoterProcess('View'))
+    dispatch(setActiveProduct(products[0]))
   }, [])
   
 

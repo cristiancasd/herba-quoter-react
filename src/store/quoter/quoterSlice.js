@@ -61,11 +61,17 @@ export const quoterSlice = createSlice({
         categories:[],
         orderProducts:{},
         activeProductToEdit: null,
-        activeProduct: null,
-        activeCategory: null,        
+
+        initialProduct:undefined,
+        initialQuoter: undefined,
+        activeProduct: undefined,
+        activeCategory: undefined,      
+        
+        
         statusQuoter:'communicating',
         productsLoaded: null,
         categoriesLoaded: null,
+        quotersLoaded: null,
         quoterProcess: 'View',
         errorMessage: undefined,
         successMessage: undefined,
@@ -86,10 +92,25 @@ export const quoterSlice = createSlice({
 
         temporalQuoter:{},
 
+        sideBarSelection:undefined,
+
     },
 
     reducers:{
 
+        setInitialProduct: (state, {payload}) => {
+            console.log('initial product, quoterSlice = ',payload);
+            state.initialProduct=payload;
+        },
+
+        setInitialQuoter: (state, {payload}) => {
+            console.log('initial quoter, quoterSlice = ',payload);
+            state.initialQuoter=payload;
+        },
+
+        setQuotersLoaded: (state, {payload}) => {
+            state.quotersLoaded=true
+        },
 
         setLoadedProductsCategories: (state, {payload}) => {
             productsLoaded= null;
@@ -159,7 +180,9 @@ export const quoterSlice = createSlice({
             state.statusQuoter='ok';
             state.selection='product';
             state.activeProduct=payload;
-            state.activeCategory=undefined;           
+            state.activeCategory=undefined; 
+            state.activeQuoter=undefined; 
+            state.sideBarSelection='products'          
         },
 
         setActiveProductToEdit: ( state, { payload } ) => {
@@ -176,7 +199,9 @@ export const quoterSlice = createSlice({
             state.selection='category';
             //state.activeProduct={};
             state.activeProduct=undefined;
-            state.activeCategory=payload;           
+            state.activeCategory=payload;  
+            state.activeQuoter=undefined    
+            state.sideBarSelection='products'      
         },
 
         setQuoterProcess: ( state, { payload } ) => {
@@ -226,7 +251,10 @@ export const quoterSlice = createSlice({
         setActiveQuoter:(state, {payload})=>{
             console.log('estoy en setActiveQuoter');
             state.activeQuoter=payload
+            state.activeCategory=undefined
+            state.activeProduct=undefined
             console.log('activeQuote es ', state.activeQuoter)
+            state.sideBarSelection='quoters' 
         },
         setActiveQuoterToEdit:(state, {payload})=>{
             state.activeQuoterToEdit=payload;          
@@ -307,5 +335,10 @@ export const {
     onCreateQuoter,
 
     setPriceDiscountQuoter,
+
+    setQuotersLoaded,
+    setInitialProduct,
+    setInitialQuoter,
+
 
  } = quoterSlice.actions

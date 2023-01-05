@@ -3,7 +3,7 @@ import { AddOutlined } from "@mui/icons-material"
 import { IconButton, Typography } from "@mui/material"
 import { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
-import { setQuoterProcess, setActiveProductToEdit, setActiveCategoryToAdd, setActiveQuoter, setActiveQuoterToEdit } from "../../store/quoter/quoterSlice"
+import { setQuoterProcess, setActiveProductToEdit, setActiveCategoryToAdd, setActiveQuoter, setActiveQuoterToEdit, setQuotersLoaded, setInitialQuoter } from "../../store/quoter/quoterSlice"
 import { CheckingAuth } from "../../ui/components/CheckingAuth"
 import { QuoterLayout } from "../layout/QuoterLayout"
 import { NewEditViewCategory } from "../views/NewEditViewCategory"
@@ -17,13 +17,17 @@ import { ViewAddProductsQuoter } from "../views/ViewAddProductsQuoter"
 export const QuoterPage = () => {
 
   const dispatch=useDispatch();
-  const { quoterProcess, activeQuoter, quoters, isAddProductQuoterProcess}= useSelector(state=>state.quoter)
+  const { quoterProcess, activeQuoter, quoters, isAddProductQuoterProcess, quotersLoaded}= useSelector(state=>state.quoter)
   const{user}= useSelector(state=> state.auth)
-  const isHired = user.rol=='user'||isAddProductQuoterProcess ?{ display: 'none' } :{ display: '' }
+  //const isHired = user.rol=='user'||isAddProductQuoterProcess ?{ display: 'none' } :{ display: '' }
+  const isHired = isAddProductQuoterProcess ?{ display: 'none' } :{ display: '' }
+
 
   useEffect(() => {
+    dispatch(setInitialQuoter(quoters[0]))
     dispatch(setActiveQuoter(quoters[0]))
     dispatch(setQuoterProcess('Edit'))
+    dispatch(setQuotersLoaded(true))
   }, [])
 
   const startCreate=()=>{
@@ -33,7 +37,7 @@ export const QuoterPage = () => {
         id:'',
         title:'',
         description:'',
-        products:[],
+        products:{},
         total:0,
       }
       dispatch(setActiveQuoter(quoterReset));
@@ -43,11 +47,9 @@ export const QuoterPage = () => {
   } 
 
 
-  if(!activeQuoter){
-    return <h3>Cargando ....</h3>
+  if(!quotersLoaded){
+    return <h3>Upload quoter Page ....</h3>
   }
-
-
 
 
   return (

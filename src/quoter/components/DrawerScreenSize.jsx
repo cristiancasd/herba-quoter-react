@@ -1,34 +1,39 @@
-import { TurnedInNot , Stars, StartSharp, StarOutlined, SearchOutlined} from '@mui/icons-material'
-import { Divider, Drawer, Grid, List, ListItem, ListItemButton, ListItemIcon, ListItemText, TextField, Toolbar, Typography,  } from '@mui/material'
-import React, { useEffect, useMemo, useState } from 'react'
+import { Divider, Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, TextField, Toolbar, Typography,  } from '@mui/material'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector,  } from 'react-redux/es/exports'
-import { handleMobileOpen, setIsAddProductQuoterProcess, setOrderProducts, setScreenCel} from '../../store/quoter/quoterSlice'
+import { handleMobileOpen,setScreenCel} from '../../store/quoter/quoterSlice'
 import useMediaQuery from '@mui/material/useMediaQuery';
 import { SideBarItemCategories } from './SideBarItemCategories'
 import { SideBarItemProducts } from './sideBarItemProducts'
 import { SideBarItemQuoters } from './SideBarItemQuoters'
 
-
+const initArray=[]
 export const DrawerScreenSize = (data) => {
-  
-  const {mobileOpen, isScreenCel, categories, products, quoters, activeQuoter} = useSelector(state => state.quoter) 
+
+  const [toShowMainMenu, setToShowMainMenu]= useState([]);
+  const [toShowSideBarComplete, setToShowSideBarComplete]= useState([]);
+
+  const [menuProducts, setMenuProducts]= useState([]);
+  const [menuQuoters, setMenuQuoters]= useState([]);
+  const [menuSearch, setMenuSearch]= useState(undefined)
+
+  const [onUpdateMenu, setOnUpdatemenu]= useState(true);
+
+
+  const {mobileOpen, isScreenCel, categories, products, quoters, activeQuoter, sideBarSelection} = useSelector(state => state.quoter) 
   const{userName, menuProductosCategorias, drawerWidth }=data;
   const dispatch = useDispatch();
-
-  const [toShowMainMenu, setToShowMainMenu]= useState([])
-  const [toShowMenu, setToShowMenu]= useState([])
-  const [toShow, setToShow]= useState([])
  
-
+ 
   const onSearch=({target})=>{
     const toSearch=target.value.toLowerCase();
-
         if(toSearch===''){
-          setToShowMenu(toShowMainMenu);
+          setMenuSearch(undefined)
+          setOnUpdatemenu(!onUpdateMenu);
           return
         }
 
-        let toShowMenu=[]
+        let toShowMenuSearch=[]
         if(activeQuoter){
           const quotersMatches = quoters.filter(element => {
             if (element.title.toLowerCase().includes(toSearch)) 
@@ -36,7 +41,7 @@ export const DrawerScreenSize = (data) => {
           });
 
             quotersMatches.map(quoter=>
-            toShowMenu.push(<SideBarItemQuoters key={quoter.id}{ ...quoter}/>))
+              toShowMenuSearch.push(<SideBarItemQuoters key={quoter.id}{ ...quoter}/>))
             
         }else{
 
@@ -49,38 +54,50 @@ export const DrawerScreenSize = (data) => {
                 return true;
           });
             categoriesMatches.map(category =>
-              toShowMenu.push(<SideBarItemCategories key={category.id}{ ...category}/>))
+              toShowMenuSearch.push(<SideBarItemCategories key={category.id}{ ...category}/>))
             productsMatches.map(product=>
-              toShowMenu.push(<SideBarItemProducts key={product.id}{ ...product }/>))    
+              toShowMenuSearch.push(<SideBarItemProducts key={product.id}{ ...product }/>))    
         }
-        setToShowMenu(toShowMenu)
+        setMenuSearch(toShowMenuSearch);
+        setOnUpdatemenu(!onUpdateMenu);
   }
 
-  useEffect(() => {
-    let toShowMenu=[]
-    if(activeQuoter){ 
-      quoters.map(quoter=>{
-        toShowMenu.push(<SideBarItemQuoters key={quoter.id}{ ...quoter}/>);
-      })
-    }else{    
-      categories.map( category => {
-        toShowMenu.push(<SideBarItemCategories key={category.id}{ ...category}/>);
-          products.map(product=>{ 
-              if(product.category.id===category.id){
-                toShowMenu.push(<SideBarItemProducts key={product.id}{ ...product }/>);
-              }
-              return           
-          })
-        return
-        });
-    }
-    setToShowMenu(toShowMenu)
-    setToShowMainMenu(toShowMenu)
-  }, [activeQuoter])
 
+//Update menu when array quoters changes
+useEffect(() => {
+  console.log('un nuevo menu de quoters')
+  let menuQuotersTemporal=[]
+    quoters.map(quoter=>
+      menuQuotersTemporal.push(<SideBarItemQuoters key={quoter.id}{ ...quoter}/>)
+    )
+  setMenuQuoters(menuQuotersTemporal)
+  setOnUpdatemenu(!onUpdateMenu)
+}, [quoters])
+
+//Update menu when array Categories-Products changes
+useEffect(() => {
+  let menuProductsTemporal=[]
+  console.log('un nuevo menu de products')
+    categories.map( category => {
+      menuProductsTemporal.push(<SideBarItemCategories key={category.id}{ ...category}/>);
+        products.map(product=>{ 
+            if(product.category.id===category.id){
+              menuProductsTemporal.push(<SideBarItemProducts key={product.id}{ ...product }/>);
+            }
+            return           
+        })
+      return
+      });
+  
+  setMenuProducts(menuProductsTemporal)
+  setOnUpdatemenu(!onUpdateMenu)
+}, [products||categories])
+
+
+
+useEffect(() => {
+  console.log('estoy definiendo el menu')
  
-
-  useEffect(() => {
     const toShow=
   <>
       <Toolbar>
@@ -98,22 +115,22 @@ export const DrawerScreenSize = (data) => {
                         name="search"                
                         placeholder="Search"
                         label='Search'
-                        
                         onChange={onSearch}
                         sx={{border:'none', mb:1}}
                     />
-
-
         </ListItem>
           {
-            toShowMenu
+            menuSearch
+              ? menuSearch
+              : sideBarSelection=='quoters'
+                ? menuQuoters
+                : menuProducts
           }
       </List>
   </>
-  setToShow(toShow)
-  }, [toShowMenu])
-  
-  
+  setToShowSideBarComplete(toShow)
+  }, [onUpdateMenu])
+
 
 
 const handleDrawerToggle = () => {
@@ -125,6 +142,7 @@ useEffect(() => {
   if (wideScreenBig=== isScreenCel) dispatch(setScreenCel(!wideScreenBig));
 }, [wideScreenBig])
 
+
   
   return (    
     <>
@@ -135,7 +153,7 @@ useEffect(() => {
               open   
               sx={{ display: { xs: 'block'},'& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth }}}
               >
-              {toShow}               
+              {toShowSideBarComplete}               
           </Drawer>)
 
           : (<Drawer
@@ -146,7 +164,7 @@ useEffect(() => {
               sx={{ display: { xs: 'block',sm: 'none'},
               '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth }}}
               >
-              {toShow}
+              {toShowSideBarComplete}
             </Drawer>)
       }
     </>

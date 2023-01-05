@@ -13,7 +13,7 @@ export const ImageGallery=()=> {
     activeQuoter
       ? itemData = [{ img: activeQuoter.image, title: activeQuoter.title,}]
       : itemData = [{ img: activeProductToEdit.image,title: activeProductToEdit.title,}]
-    console.log('itemData', {itemData, vector: itemData[0], vimg: itemData[0].img } )
+    console.log('imageGallery: itemData', {itemData, vector: itemData[0], vimg: itemData[0].img } )
     if(itemData[0].img=='' || !itemData[0].img) itemData=[{img: imageError, title: 'error'}, ]
 
   }catch(error){

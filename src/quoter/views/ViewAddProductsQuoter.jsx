@@ -11,7 +11,7 @@ export const ViewAddProductsQuoter = () => {
     const{products, activeQuoter, priceDiscountQuoter}= useSelector(state=> state.quoter);
     const dispatch=useDispatch()
 
-    const updateQuoter=async()=>{
+    const updateQuoter=async()=>{ 
         const newQuoterActive= await adaptNewActiveQuoter({activeQuoter, products, priceDiscountQuoter})
         dispatch(setActiveQuoter(newQuoterActive));
         dispatch(setIsAddProductQuoterProcess(false));
@@ -31,7 +31,7 @@ export const ViewAddProductsQuoter = () => {
             if (element.title.toLowerCase().includes(productToSearch)) 
               return true;
           });
-        console.log(productsMatches)
+        //console.log(productsMatches)
 
         setProductsMatches2(productsMatches)
     }

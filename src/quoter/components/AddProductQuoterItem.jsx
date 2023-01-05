@@ -10,19 +10,18 @@ export const AddProductQuoterItem=(product)=> {
     
     const dispatch = useDispatch();
     const [counter, setCounter]= useState(activeQuoter.products[product.sku] ? activeQuoter.products[product.sku].quantity : '0' );
-    
     const onInputChange=({target})=>{
         let newValue= +target.value>=0 || target.value==''
             ? (target.value) 
             : (0)
-        if(newValue!=counter){ 
+        if(newValue!=counter){  
             if(+newValue>99){
                 const total= counter*product[priceDiscountQuoter]
                 dispatch(setProductsActiveQuoter({sku:product.sku, quantity:counter, total}))
                 setCounter(counter);
             }else{
                 if(newValue!='') newValue= (+newValue).toFixed()
-                const total= +newValue*product[priceDiscountQuoter] ;
+                const total= +newValue*product[priceDiscountQuoter];
                 dispatch(setProductsActiveQuoter({sku:product.sku, quantity:+newValue, total }));
                 setCounter(newValue)   
             }           
@@ -53,7 +52,7 @@ export const AddProductQuoterItem=(product)=> {
         <Box sx={{ 
             flexGrow: 1,
             marginTop: '15px',
-            marginBottom: '15px'
+            marginBottom: '15px' 
         
         }}>
             <Grid container  >

@@ -31,8 +31,11 @@ export const NewEditViewQuoter = () => {
 
     const{errorMessage, successMessage, statusQuoter, quoterProcess,
         activeQuoter, activeQuoterToEdit, 
-        products, isScreenCel, quoters, priceDiscountQuoter
+        products, isScreenCel, quoters, priceDiscountQuoter,
+        initialQuoter
      }= useSelector(state=> state.quoter)
+
+ 
 
     const {title, description, formState, isFormValid, titleValid,
     onInputChange, onResetForm} =useForm(activeQuoterToEdit, formValidations)
@@ -40,25 +43,33 @@ export const NewEditViewQuoter = () => {
     const fileInputRef=useRef();
     const dispatch=useDispatch();
 
-    let claves = Object.keys(activeQuoter.products); 
+
+    const [quoterToShow, seQuoterToShow] = useState(initialQuoter)
+    useEffect(() => {
+        if(activeQuoter) seQuoterToShow(activeQuoter)
+    }, [activeQuoter])
+
+    if(!initialQuoter) return 'algo'
+
+    let claves = Object.keys(quoterToShow.products); 
     
     const [pricesQuoter, setPricesQuoter]= useState(['pricepublic', 'price15', 'price25', 
       'price35', 'price42', 'price50'])
 
     
-    const [productsQuoter, setProductsQuoter] = useState(activeQuoter.products);
+    const [productsQuoter, setProductsQuoter] = useState(quoterToShow.products);
     
     //set original products before quoter updated
     useEffect(() => {
       if(quoterProcess=='Edit'){
-        const activeProductBeforeSaveUpdate = quoters.find(element => element.id == activeQuoter.id);
+        const activeProductBeforeSaveUpdate = quoters.find(element => element.id == quoterToShow.id);
         setProductsQuoter(activeProductBeforeSaveUpdate.products)}
     }, []) 
     
     // set Products quoter when a new quoter is selected
     useEffect(() => {
-      if(activeQuoter.title != title)setProductsQuoter(activeQuoter.products)
-    }, [activeQuoter.title])
+      if(quoterToShow.title != title)setProductsQuoter(quoterToShow.products)
+    }, [quoterToShow.title])
     
 
     // Temporal quoter table
@@ -72,10 +83,10 @@ export const NewEditViewQuoter = () => {
           rowsTemporal.push(
           createData(
                   productSku,
-                  activeQuoter.products[productSku].title, 
-                  activeQuoter.products[productSku].quantity,
-                  activeQuoter.products[productSku].unitPrice,
-                  activeQuoter.products[productSku].total
+                  quoterToShow.products[productSku].title, 
+                  quoterToShow.products[productSku].quantity,
+                  quoterToShow.products[productSku].unitPrice,
+                  quoterToShow.products[productSku].total
               )
           
           )
@@ -83,7 +94,7 @@ export const NewEditViewQuoter = () => {
       
       setRows(rowsTemporal)
       
-    }, [activeQuoter])
+    }, [quoterToShow])
    
    
     const [formSubmitted, setFormSubmitted] = useState(false);
@@ -95,19 +106,17 @@ export const NewEditViewQuoter = () => {
         if(err!=='')Swal.fire('Formulary incorrect', err, 'error');
         if(!isFormValid) return;
         quoterProcess==='Edit'
-          ? dispatch(startUpdateQuoter({...activeQuoter, title, description}))        
-          : dispatch(startCreateQuoter({...activeQuoter, title, description}));
+          ? dispatch(startUpdateQuoter({...quoterToShow, title, description}))        
+          : dispatch(startCreateQuoter({...quoterToShow, title, description}));
 
         // Creo que los puedo quitar
-        dispatch(setActiveQuoter({...activeQuoter, title, description}));
-        setProductsQuoter(activeQuoter.products)
+        dispatch(setActiveQuoter({...quoterToShow, title, description}));
+        setProductsQuoter(quoterToShow.products)
     }
 
     const deleteProductList=async (event, skuToDelete)=>{ 
-         
-        const newQuoterActive= await adaptNewActiveQuoter({activeQuoter, products, skuToDelete, priceDiscountQuoter});
+        const newQuoterActive= await adaptNewActiveQuoter({quoterToShow, products, skuToDelete, priceDiscountQuoter});
         dispatch(setActiveQuoter(newQuoterActive));
-        console.log('newQuoterActive es ', newQuoterActive)
     }
 
     useEffect(()=>{
@@ -138,7 +147,7 @@ export const NewEditViewQuoter = () => {
 
     const selectChange=({target})=>{
       dispatch(setPriceDiscountQuoter(target.value))
-      const newActiveQuoter=adaptNewActiveQuoter({priceDiscountQuoter:target.value, products, activeQuoter})
+      const newActiveQuoter=adaptNewActiveQuoter({priceDiscountQuoter:target.value, products, quoterToShow})
       dispatch(setActiveQuoter(newActiveQuoter))
     }
 
@@ -152,7 +161,7 @@ export const NewEditViewQuoter = () => {
           <Grid container direction='row' justifyContent='space-between' alignItems='center' sx={{mb:1}} item xs={12}  md={12}>
               <Grid item>
                   <Typography fontSize={34} fontWeight='light'> {quoterProcess} Quoter</Typography>
-                  <Typography fontSize={20} fontWeight='light'> {activeQuoter.title} </Typography>
+                  <Typography fontSize={20} fontWeight='light'> {quoterToShow.title} </Typography>
 
                   
               </Grid>
@@ -176,9 +185,9 @@ export const NewEditViewQuoter = () => {
                   <Button 
                       disabled={
                         statusQuoter=='communicating' ||
-                        (activeQuoter.title==title && 
-                          activeQuoter.description==description && 
-                          activeQuoter.products==productsQuoter)
+                        (quoterToShow.title==title && 
+                          quoterToShow.description==description && 
+                          quoterToShow.products==productsQuoter)
                        }
                       type="submit" 
                       color='primary' sx={{padding:2}}>
@@ -276,11 +285,11 @@ export const NewEditViewQuoter = () => {
                 <TableBody>
                 <TableRow>
                     <TableCell colSpan={1}>TOTAL COP</TableCell>
-                    <TableCell align="center">$ {activeQuoter.total.toLocaleString('es-CO')}</TableCell>
+                    <TableCell align="center">$ {quoterToShow.total.toLocaleString('es-CO')}</TableCell>
                   </TableRow>
                   <TableRow>
                     <TableCell colSpan={1}>PV:</TableCell>
-                    <TableCell align="center">{activeQuoter.pv}</TableCell>
+                    <TableCell align="center">{quoterToShow.pv}</TableCell>
                   </TableRow>
                 </TableBody>
               </Table>

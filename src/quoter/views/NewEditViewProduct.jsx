@@ -8,7 +8,7 @@ import { useForm } from "../../hooks/useForm";
 import { useEffect, useRef, useState } from "react";
 import { startCreateProduct, startUpdateProduct, startUploadingFiles } from "../../store/quoter/thunks";
 import Swal from 'sweetalert2'
-import { setQuoterProcess } from "../../store/quoter/quoterSlice";
+import { setActiveProduct, setQuoterProcess } from "../../store/quoter/quoterSlice";
 //import { communicatingBackend, setIsSaving } from "../../store/quoter/quoterSlice";
 
 
@@ -21,7 +21,7 @@ const formValidations={
 export const NewEditViewProduct = () => {
     
     const{errorMessage, categories, activeProductToEdit, activeProduct,
-        statusQuoter, quoterProcess, successMessage }= useSelector(state=> state.quoter)
+        statusQuoter, quoterProcess, successMessage, initialProduct }= useSelector(state=> state.quoter)
 
     const{user}= useSelector(state=> state.auth)
     const isReadOnly = user.rol=='user' || quoterProcess=== 'View'?{ readOnly: true } :{ readOnly: false }
@@ -39,8 +39,14 @@ export const NewEditViewProduct = () => {
 
     // Variable para saber si el formulario ya fue submitted
     const [formSubmitted, setFormSubmitted] = useState(false)
+    const [productToShow, setProductToShow] = useState(initialProduct)
 
- 
+
+    useEffect(() => {
+        if(activeProduct) setProductToShow(activeProduct)
+    }, [activeProduct])
+
+    
 
     const onClickSaveProduct = (event) =>{
         event.preventDefault();
@@ -84,7 +90,7 @@ export const NewEditViewProduct = () => {
 
             <Grid item >
                 <Typography fontSize={34} fontWeight='light'> {user.rol=='user' ? 'View' :quoterProcess} Product: </Typography>
-                <Typography fontSize={20} fontWeight='light'> {activeProduct.title} </Typography>
+                <Typography fontSize={20} fontWeight='light'> {productToShow.title} </Typography>
             </Grid>
            
             
@@ -123,17 +129,17 @@ export const NewEditViewProduct = () => {
                 <Button 
                     disabled={
                         statusQuoter=='communicating' ||
-                        (activeProduct.title==title && 
-                          activeProduct.description==description && 
-                          activeProduct.pricepublic==pricepublic &&
-                          activeProduct.price15==price15 && 
-                          activeProduct.price25==price25 && 
-                          activeProduct.price35==price35 &&
-                          activeProduct.price42==price42 && 
-                          activeProduct.price50==price50 &&
-                          activeProduct.sku==sku && 
-                          activeProduct.pv==pv && 
-                          activeProduct.category.id==categoryId 
+                        (productToShow.title==title && 
+                            productToShow.description==description && 
+                            productToShow.pricepublic==pricepublic &&
+                            productToShow.price15==price15 && 
+                            productToShow.price25==price25 && 
+                            productToShow.price35==price35 &&
+                            productToShow.price42==price42 && 
+                            productToShow.price50==price50 &&
+                            productToShow.sku==sku && 
+                            productToShow.pv==pv && 
+                            productToShow.category.id==categoryId 
                         )
                        }
                     type="submit" 
@@ -316,7 +322,7 @@ export const NewEditViewProduct = () => {
                             error={!!skuValid && formSubmitted /*Casilla roja por error*/}
                             helperText={skuValid /*Texto error bajo la casilla*/}
                             required
-                            inputProps={quoterProcess=='Edit' ?{ readOnly: true } :{ readOnly: false }}
+                            inputProps={quoterProcess!='Create' ?{ readOnly: true } :{ readOnly: false }}
                             />
                     </Grid>
 
