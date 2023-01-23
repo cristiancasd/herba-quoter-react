@@ -3,13 +3,37 @@ import { useEffect, useState, } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setProductsActiveQuoter } from "../../store/quoter/quoterSlice";
 
+
+function createData(productSku, title, quantity, unitPrice, total) {
+    return { productSku, title, quantity, unitPrice, total };
+}
+
 export const AddProductQuoterItem=(product)=> {
 
     const {activeQuoter, priceDiscountQuoter}=useSelector(state=> state.quoter);
     
     
     const dispatch = useDispatch();
-    const [counter, setCounter]= useState(activeQuoter.products[product.sku] ? activeQuoter.products[product.sku].quantity : '0' );
+    const [counter, setCounter]= useState(
+        
+        
+        0
+        //activeQuoter.products[product.sku] ? activeQuoter.products[product.sku].quantity : '0'
+        
+        
+        
+        );
+
+    useEffect(() => {
+        console.log('estoy en useEffect de de addProductQuoterItem')
+        activeQuoter.products.map((productByQuoter)=>{
+            if(productByQuoter && productByQuoter.sku===product.sku){
+                setCounter(productByQuoter.quantity);
+                return
+            }
+        })
+    }, [])
+    
     const onInputChange=({target})=>{
         let newValue= +target.value>=0 || target.value==''
             ? (target.value) 
@@ -17,12 +41,14 @@ export const AddProductQuoterItem=(product)=> {
         if(newValue!=counter){  
             if(+newValue>99){
                 const total= counter*product[priceDiscountQuoter]
-                dispatch(setProductsActiveQuoter({sku:product.sku, quantity:counter, total}))
+                const pvProductQuoter=product.pv*counter
+                dispatch(setProductsActiveQuoter({sku:product.sku, quantity:counter, total, pv:+pvProductQuoter, title: product.title}))
                 setCounter(counter);
             }else{
                 if(newValue!='') newValue= (+newValue).toFixed()
                 const total= +newValue*product[priceDiscountQuoter];
-                dispatch(setProductsActiveQuoter({sku:product.sku, quantity:+newValue, total }));
+                const pvProductQuoter=product.pv*counter
+                dispatch(setProductsActiveQuoter({sku:product.sku, quantity:+newValue, total, pv:+pvProductQuoter, title: product.title }));
                 setCounter(newValue)   
             }           
         }

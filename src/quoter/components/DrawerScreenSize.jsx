@@ -6,6 +6,7 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { SideBarItemCategories } from './SideBarItemCategories'
 import { SideBarItemProducts } from './sideBarItemProducts'
 import { SideBarItemQuoters } from './SideBarItemQuoters'
+import { SideBarItemDefaultQuoters } from './SideBarItemDefaultQuoters';
 
 const initArray=[]
 export const DrawerScreenSize = (data) => {
@@ -20,7 +21,7 @@ export const DrawerScreenSize = (data) => {
   const [onUpdateMenu, setOnUpdatemenu]= useState(true);
 
 
-  const {mobileOpen, isScreenCel, categories, products, quoters, activeQuoter, sideBarSelection} = useSelector(state => state.quoter) 
+  const {mobileOpen, isScreenCel, categories, products, quoters, activeQuoter, navBarSelection, quotersDefault} = useSelector(state => state.quoter) 
   const{userName, menuProductosCategorias, drawerWidth }=data;
   const dispatch = useDispatch();
  
@@ -34,17 +35,23 @@ export const DrawerScreenSize = (data) => {
         }
 
         let toShowMenuSearch=[]
-        if(activeQuoter){
-          const quotersMatches = quoters.filter(element => {
+        if(navBarSelection==='quoters'){
+
+          const quotersMatchesUser = quoters.filter(element => {
             if (element.title.toLowerCase().includes(toSearch)) 
                return true;
           });
-
-            quotersMatches.map(quoter=>
+          quotersMatchesUser.map(quoter=>
               toShowMenuSearch.push(<SideBarItemQuoters key={quoter.id}{ ...quoter}/>))
-            
+          
+          const quotersMatchesDefault = quotersDefault.filter(element => {
+            if (element.title.toLowerCase().includes(toSearch)) 
+                return true;
+            });
+          quotersMatchesDefault.map(quoter=>
+            toShowMenuSearch.push(<SideBarItemDefaultQuoters key={quoter.id}{ ...quoter}/>))
+          
         }else{
-
           const categoriesMatches = categories.filter(element => {
             if (element.title.toLowerCase().includes(toSearch)) 
                   return true;
@@ -62,14 +69,22 @@ export const DrawerScreenSize = (data) => {
         setOnUpdatemenu(!onUpdateMenu);
   }
 
+  //console.log('Definiendo menuDefaultQuoter')
+  const menuDefaultQuoter=quotersDefault.map(quoter=>{
+    return (<SideBarItemDefaultQuoters key={quoter.id}{ ...quoter}/>)
+  }
+  )
 
 //Update menu when array quoters changes
 useEffect(() => {
-  console.log('un nuevo menu de quoters')
+  //console.log('un nuevo menu de quoters')
+  
   let menuQuotersTemporal=[]
     quoters.map(quoter=>
       menuQuotersTemporal.push(<SideBarItemQuoters key={quoter.id}{ ...quoter}/>)
     )
+    //console.log('***==**===** ', {menuQuotersTemporal, menuQuoters })
+
   setMenuQuoters(menuQuotersTemporal)
   setOnUpdatemenu(!onUpdateMenu)
 }, [quoters])
@@ -77,7 +92,7 @@ useEffect(() => {
 //Update menu when array Categories-Products changes
 useEffect(() => {
   let menuProductsTemporal=[]
-  console.log('un nuevo menu de products')
+  //console.log('*********************************un nuevo menu de products')
     categories.map( category => {
       menuProductsTemporal.push(<SideBarItemCategories key={category.id}{ ...category}/>);
         products.map(product=>{ 
@@ -91,39 +106,25 @@ useEffect(() => {
   
   setMenuProducts(menuProductsTemporal)
   setOnUpdatemenu(!onUpdateMenu)
-}, [products||categories])
+}, [products && categories])
+
+
 
 
 
 useEffect(() => {
-  console.log('estoy definiendo el menu')
+  //console.log('estoy definiendo el menu')
+  //console.log({menuDefaultQuoter, menuQuoters})
  
     const toShow=
   <>
-      <Toolbar>
-          <Typography variant='h6' noWrap component='div'>
-              {userName}
-          </Typography>              
-      </Toolbar>
-      <Divider variant="middle" /> 
+      
       <List> 
-        <ListItem  disablePadding>
-        <TextField
-                        type='text'
-                        variant='filled'
-                        fullWidth 
-                        name="search"                
-                        placeholder="Search"
-                        label='Search'
-                        onChange={onSearch}
-                        sx={{border:'none', mb:1}}
-                    />
-        </ListItem>
           {
             menuSearch
               ? menuSearch
-              : sideBarSelection=='quoters'
-                ? menuQuoters
+              : navBarSelection=='quoters'
+                ? menuQuoters.concat(menuDefaultQuoter)
                 : menuProducts
           }
       </List>
@@ -143,6 +144,29 @@ useEffect(() => {
 }, [wideScreenBig])
 
 
+const nameUserAndSearchField=
+<>
+
+<Toolbar>
+          <Typography variant='h6' noWrap component='div'>
+              {userName}
+          </Typography>              
+      </Toolbar>
+      <Divider variant="middle" /> 
+      <TextField
+                          type='text'
+                          variant='filled'
+                          fullWidth 
+                          name="search"                
+                          placeholder="Search"
+                          label='Search'
+                          onChange={onSearch}
+                          sx={{border:'none', mb:1}}
+                      />
+</>
+
+
+
   
   return (    
     <>
@@ -153,6 +177,7 @@ useEffect(() => {
               open   
               sx={{ display: { xs: 'block'},'& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth }}}
               >
+              {nameUserAndSearchField}
               {toShowSideBarComplete}               
           </Drawer>)
 
@@ -164,6 +189,7 @@ useEffect(() => {
               sx={{ display: { xs: 'block',sm: 'none'},
               '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth }}}
               >
+              {nameUserAndSearchField}
               {toShowSideBarComplete}
             </Drawer>)
       }

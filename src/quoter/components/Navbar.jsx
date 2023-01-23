@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector,  } from "react-redux";
 import { Link} from "react-router-dom";
 import { startLogout } from "../../store/auth/thunks";
-import { handleMobileOpen } from "../../store/quoter/quoterSlice";
+import { handleMobileOpen, setDefaultInitalVariablesRedux, setNavBarSelection } from "../../store/quoter/quoterSlice";
 
 
 const pages = ['Quoter', 'Categ/Prod', 'Admin'];
@@ -13,7 +13,7 @@ const settings = ['Profile', 'Edit Profile', 'Logout'];
 export const Navbar = ({drawerWidth=240}) => {
   const dispatch = useDispatch();  
 
-  const {mobileOpen, activeQuoter } = useSelector(state => state.quoter)
+  const {mobileOpen, navBarSelection } = useSelector(state => state.quoter)
   const {user } = useSelector(state => state.auth)
   
   const [anchorElUser, setAnchorElUser] = useState(null);
@@ -30,17 +30,14 @@ export const Navbar = ({drawerWidth=240}) => {
   const logout = () => { 
     dispatch(startLogout())
     setAnchorElUser(null);
+    dispatch(setDefaultInitalVariablesRedux())
   }
 
   const handleDrawerToggle = () => { 
     dispatch(handleMobileOpen(!mobileOpen))  
   }
 
-  const[menu,setMenu]=useState('quoters');
 
-  useEffect(() => {
-    setMenu(activeQuoter ? 'quoters' : 'products')
-  }, [activeQuoter])
   
 
   
@@ -66,9 +63,10 @@ export const Navbar = ({drawerWidth=240}) => {
           <Box sx={{ flexGrow: 1, display: 'flex' }}>
           
           <Link to="/quoter">
-            <Button 
+            <Button
+              onClick={()=>dispatch(setNavBarSelection('quoters'))} 
               sx={{ my: 2, color: 'white', display: 'block', }}
-              variant={menu=='quoters' ? 'contained' :''}
+              variant={navBarSelection=='quoters' ? 'contained' :''}
               color='personal'
                 > Quoter     
             </Button>
@@ -77,7 +75,7 @@ export const Navbar = ({drawerWidth=240}) => {
           
           <Link to="/products">
             <Button sx={{ my: 2, color: 'white', display: 'block' }}
-              variant={menu=='products' ? 'contained' :''}
+              variant={navBarSelection=='products' ? 'contained' :''}
               color='personal'
               >
                     Products

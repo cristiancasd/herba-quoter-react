@@ -71,7 +71,7 @@ export const quoterSlice = createSlice({
         statusQuoter:'communicating',
         productsLoaded: null,
         categoriesLoaded: null,
-        quotersLoaded: null,
+        quotersLoaded: undefined,
         quoterProcess: 'View',
         errorMessage: undefined,
         successMessage: undefined,
@@ -83,20 +83,31 @@ export const quoterSlice = createSlice({
 
 
         isAddProductQuoterProcess: false,
-        quoters:[activeQuoterExample, activeQuoterExample2],
-        activeQuoter:activeQuoterExample,
-        activeQuoterToEdit:{
-            title: activeQuoterExample.title,
-            description: activeQuoterExample.description
-        },
-
+        quoters:[],
+        activeQuoter:undefined,
+        activeQuoterToEdit:undefined,
+        quoterSelected:undefined,
         temporalQuoter:{},
 
-        sideBarSelection:undefined,
+
+        quotersDefaultLoaded: undefined,
+        quotersDefault: [],
+
+        navBarSelection:undefined,
+
+        onSaving: false,
 
     },
 
     reducers:{
+
+        setOnSaving: (state, {payload})=>{
+            state.onSaving=payload;
+        },
+
+        setDefaultInitalVariablesRedux: (state)=>{
+            state.quotersLoaded=undefined;
+        },
 
         setInitialProduct: (state, {payload}) => {
             console.log('initial product, quoterSlice = ',payload);
@@ -106,10 +117,7 @@ export const quoterSlice = createSlice({
         setInitialQuoter: (state, {payload}) => {
             console.log('initial quoter, quoterSlice = ',payload);
             state.initialQuoter=payload;
-        },
-
-        setQuotersLoaded: (state, {payload}) => {
-            state.quotersLoaded=true
+            state.activeQuoter=payload;
         },
 
         setLoadedProductsCategories: (state, {payload}) => {
@@ -129,8 +137,95 @@ export const quoterSlice = createSlice({
             state.productsLoaded='ok';            
         },
 
+        setQuoters:(state,{payload}) => {
+            console.log('estoy en setQuoters ', payload);
+            state.quoters=payload;
+            state.quotersLoaded=true;
+        },
+
+        setQuotersDefault:(state,{payload})=>{
+            console.log('estoy en setQuoters Iniital');
+            state.quotersDefault=payload;
+            state.quotersDefaultLoaded=true;
+
+            state.activeQuoter=payload[0]
+            const {title, description}=payload[0];
+            state.activeQuoterToEdit={title, description};   
+            state.initialQuoter=payload[0];
+        },
+       
+
         setOrderProducts: (state, {payload}) =>{
             state.orderProducts=payload
+        },
+
+        onDeleteQuoter:( state, { payload }) => {
+            console.log('************************* en onDeleteQuoter')
+            state.statusQuoter='ok';
+            let newQuoterArray=[]
+            console.log('entro al map')
+            state.quoters.map(
+                quoter=>{
+                    console.log(quoter)
+                    if(quoter.id!==payload)
+                        newQuoterArray.push(quoter)
+                });
+            state.quoters=newQuoterArray;
+            state.activeQuoter=undefined;
+            //state.initalQuoter=undefined;
+        },
+
+        onDeleteProduct:( state, { payload }) => {
+            console.log('************************* en onDeleteProduct')
+            state.statusQuoter='ok';
+            let newProductArray=[]
+            console.log('entro al map')
+            state.products.map(
+                product=>{
+                    console.log(product)
+                    if(product.id!==payload)
+                        newProductArray.push(product)
+                });
+            state.products=newProductArray;
+            state.activeProduct=undefined;
+            //state.initalQuoter=undefined;
+        },
+
+        onDeleteCategory:( state, { payload }) => {
+            state.statusQuoter='ok';
+            let newCategoryArray=[]
+            state.categories.map(
+                category=>{
+                    console.log(category)
+                    if(category.id!==payload)
+                        newCategoryArray.push(category)
+                });
+            state.categories=newCategoryArray;
+            state.activeCategory=undefined;
+        },
+
+
+
+        onAddNewQuoter: ( state, { payload }) => {
+            const {title, description}= payload
+            state.statusQuoter='ok';
+            state.quotersLoaded=true;
+            state.quoters.push( payload );
+            state.activeQuoter=payload;
+            state.activeQuoterToEdit={title, description}; 
+            state.quoterProcess='View'
+            
+        },
+
+        onUpdateQuoters: ( state, { payload }) => {
+            state.statusQuoter='ok';
+            state.quoters= state.quoters.map(
+                quoter=>{
+                    return (quoter.id===payload.id)
+                        ? payload
+                        : quoter
+                })
+            state.activeQuoter=payload;
         },
 
         onAddNewProduct: ( state, { payload }) => {
@@ -138,8 +233,6 @@ export const quoterSlice = createSlice({
             state.productsLoaded='ok';
             state.categoriesLoaded='ok';
             state.products.push( payload );
-            //state.activeProduct = undefined;
-            //state.selection='product';
         },
         onUpdateProduct: ( state, { payload } ) => {
             state.products = state.products.map( product => {
@@ -181,9 +274,22 @@ export const quoterSlice = createSlice({
             state.selection='product';
             state.activeProduct=payload;
             state.activeCategory=undefined; 
-            state.activeQuoter=undefined; 
-            state.sideBarSelection='products'          
+            //state.activeQuoter=undefined; 
         },
+
+        setNavBarSelection:( state, { payload } ) => { 
+            console.log('estoy en setNavBarSelection= ', payload)
+            state.navBarSelection=payload;
+
+            state.isAddProductQuoterProcess= false; 
+
+            state.activeQuoter=
+                state.quoters[0]
+                    ? state.quoters[0]
+                    : state.quotersDefault[0]
+                  
+        },
+
 
         setActiveProductToEdit: ( state, { payload } ) => {
             state.activeProductToEdit=payload;                      
@@ -200,8 +306,7 @@ export const quoterSlice = createSlice({
             //state.activeProduct={};
             state.activeProduct=undefined;
             state.activeCategory=payload;  
-            state.activeQuoter=undefined    
-            state.sideBarSelection='products'      
+            //state.activeQuoter=undefined    
         },
 
         setQuoterProcess: ( state, { payload } ) => {
@@ -210,6 +315,7 @@ export const quoterSlice = createSlice({
 
         communicatingBackend: (state, { payload }) => { 
             //state: ok, communicating
+            
             payload
                 ? state.statusQuoter='communicating'
                 : state.statusQuoter='ok'            
@@ -238,7 +344,7 @@ export const quoterSlice = createSlice({
             state.isScreenCel= payload;
         },
 
-        setDeleteQuoterProduct:(state, {payload})=>{
+       /* setDeleteQuoterProduct:(state, {payload})=>{
             console.log('estoy en setDeleteQuoterProduct ', )
             let newProductsList={...state.activeQuoter.products}
             delete newProductsList[payload]
@@ -246,34 +352,62 @@ export const quoterSlice = createSlice({
                 ...state.activeQuoter,
                 products: {...newProductsList}
             };
-        },
+        }, */
         
         setActiveQuoter:(state, {payload})=>{
-            console.log('estoy en setActiveQuoter');
+            console.log('estoy en setActiveQuoter' , payload);
             state.activeQuoter=payload
-            state.activeCategory=undefined
-            state.activeProduct=undefined
-            console.log('activeQuote es ', state.activeQuoter)
-            state.sideBarSelection='quoters' 
         },
         setActiveQuoterToEdit:(state, {payload})=>{
-            state.activeQuoterToEdit=payload;          
+            if(payload){
+                const {title, description}=payload;
+                console.log(' const {title, description}=payload; ',{title, description} )
+                state.activeQuoterToEdit={title, description};   
+            }          
         },
 
         setIsAddProductQuoterProcess: (state, {payload})=>{
             state.isAddProductQuoterProcess=payload;         
         },
 
+        // Todo: Hacerlo en un helper 
         setProductsActiveQuoter:(state,{payload})=>{
             console.log('estoy en setProductsActiveQuoter ,', {payload})
-            const {sku, quantity, total}=payload;
-            quantity>0
-                ? state.activeQuoter.products[sku]= {...state.activeQuoter.products[sku], quantity, total }
-                : delete state.activeQuoter.products[sku];
+            
+            const {sku, quantity, total, title, pv}=payload;
+
+            //if(state.activeQuoter.products.length==0){
+            //    state.activeQuoter.products=[{sku, quantity, total, title, pv}];
+            //    return
+            //}
+
+            if(state.activeQuoter.products.length===0)
+                state.activeQuoter.products=[{sku, quantity, total, title, pv}]
+                
+            let newArrayProducts=[];
+            let algo=state.activeQuoter.products.length;
+            state.activeQuoter.products.map((productByQuoter, cont)=>{               
+                if(productByQuoter)
+                    if (productByQuoter.sku===sku){
+                        console.log('********quantity ', quantity)
+                        if( quantity>0) newArrayProducts.push({...productByQuoter, quantity, total, title, pv})
+                    } else{
+                        algo-=1;
+                        newArrayProducts.push(productByQuoter);
+                        //console.log('ALGO,state.activeQuoter.products.length ', algo,state.activeQuoter.products.length-1)
+                        if(algo==0)
+                        if( quantity>0)newArrayProducts.push({sku, quantity, total, title, pv})
+
+                        //if (cont===state.activeQuoter.products.length-1)
+                        //    newArrayProducts.push({sku, quantity, total, title, pv});
+                 }
+            
+            });
+            state.activeQuoter.products=newArrayProducts
         }, 
 
 
-        onUpdateQuoter: ( state, { payload } ) => {
+       /* onUpdateQuoter: ( state, { payload } ) => {
             state.quoters = state.quoters.map( quoter => {
                 if ( quoter.id === payload.id ) {
                     return payload;
@@ -282,25 +416,19 @@ export const quoterSlice = createSlice({
             });
             state.statusQuoter='ok';
             //state.productsLoaded='ok';
-        },
+        }, */
 
-
-        onCreateQuoter: ( state, { payload } ) => {
-            payload.id='new'+ state.quoters.length;
-            state.quoters=[...state.quoters, payload];
-            state.statusQuoter='ok';
-            //state.productsLoaded='ok';
-
-            //Todo hacerlo el thunk
-            state.activeQuoter=payload,
-            state.activeQuoterToEdit={title: payload.title, description: payload.description}
-        },
 
         setPriceDiscountQuoter: (state, {payload}) => {
             state.priceDiscountQuoter= payload
         },
 
-        
+
+        setQuoterSelected: (state, {payload}) => {
+            state.quoterSelected= payload
+            state.activeQuoter= payload
+            state.activeQuoterToEdit={title:payload.title, description: payload.description}
+        },
     },
 })
 
@@ -320,25 +448,39 @@ export const {
     setQuoterProcess,
     onUpdateProduct,
     onUpdateCategory,
+    onAddNewQuoter,
     onAddNewProduct,
     onAddNewCategory,
     handleMobileOpen,
     setScreenCel,
     setActiveCategoryToAdd, 
-    setDeleteQuoterProduct,
+    //setDeleteQuoterProduct,
     setActiveQuoter,
     setActiveQuoterToEdit,
     setIsAddProductQuoterProcess,
     setProductsActiveQuoter,
     //resetTemporalQuoter,
-    onUpdateQuoter,
-    onCreateQuoter,
+    //onUpdateQuoter,
 
     setPriceDiscountQuoter,
 
-    setQuotersLoaded,
     setInitialProduct,
     setInitialQuoter,
+    setDefaultInitalVariablesRedux,
+
+
+    setQuoters,
+    setQuotersDefault,
+    setQuoterSelected,
+
+    setNavBarSelection,
+
+    onDeleteQuoter,
+    onUpdateQuoters,
+
+    onDeleteProduct,
+    onDeleteCategory,
+    setOnSaving,
 
 
  } = quoterSlice.actions

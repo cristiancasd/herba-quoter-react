@@ -1,11 +1,11 @@
-import { BorderColorOutlined, SaveOutlined, SignalCellularNull, } from "@mui/icons-material"
+import { BorderColorOutlined, DeleteOutline, SaveOutlined, SignalCellularNull, } from "@mui/icons-material"
 import { Grid, TextField, Typography, MenuItem, InputLabel, Button } from "@mui/material"
 
 import Box from '@mui/material/Box';
 import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "../../hooks/useForm";
 import { useEffect, useState } from "react";
-import { startCreateCategory, startUpdateCategory } from "../../store/quoter/thunks";
+import { startCreateCategory, startDeleteCategory, startUpdateCategory } from "../../store/quoter/thunks";
 import Swal from 'sweetalert2'
 import { setQuoterProcess } from "../../store/quoter/quoterSlice";
 
@@ -52,6 +52,28 @@ export const NewEditViewCategory = () => {
       },[quoterProcess])
 
 
+      const configConfirmSwal={
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    }
+
+    const onDeleteCategory=(event)=>{
+        event.preventDefault();
+        Swal.fire(
+            configConfirmSwal
+        ).then((result) => {
+          if (result.isConfirmed) {
+            dispatch(startDeleteCategory(activeCategory.id));
+          }
+        })
+      }
+
+
   return (
 <>
     <form
@@ -80,6 +102,18 @@ export const NewEditViewCategory = () => {
                     <SaveOutlined sx={{fontSize: 30, mr:1}}/>
                     Save
                 </Button>
+
+                <Button 
+                      onClick={onDeleteCategory}
+                      disabled={
+                        statusQuoter=='communicating' ||
+                        quoterProcess!=='Edit'
+                       }            
+                      style={quoterProcess=== 'View' ?{ display: 'none' } : { display: '' }}         
+                      color='error' sx={{padding:2}}>
+                      <DeleteOutline sx={{fontSize: 25, mr:0}}/>
+                          Delete
+                  </Button>
             </Grid>    
         </Grid>
 

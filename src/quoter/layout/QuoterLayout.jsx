@@ -6,6 +6,7 @@ import { SideBar } from "../components/SideBar";
 const drawerWidth=240;
 
 export const QuoterLayout = ({children}) => {
+  console.log('estoy en Quoter Layout')
   return (
     
     <Box sx={{display: 'flex'}}>

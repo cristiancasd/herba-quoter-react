@@ -12,7 +12,9 @@ export const ViewAddProductsQuoter = () => {
     const dispatch=useDispatch()
 
     const updateQuoter=async()=>{ 
+        console.log('QQQQQQQQQQQ   antes de updateQuoter ', activeQuoter)
         const newQuoterActive= await adaptNewActiveQuoter({activeQuoter, products, priceDiscountQuoter})
+        console.log('QQQQQQQQQQQ   voy a updateQuoter ', newQuoterActive)
         dispatch(setActiveQuoter(newQuoterActive));
         dispatch(setIsAddProductQuoterProcess(false));
     }
@@ -31,7 +33,6 @@ export const ViewAddProductsQuoter = () => {
             if (element.title.toLowerCase().includes(productToSearch)) 
               return true;
           });
-        //console.log(productsMatches)
 
         setProductsMatches2(productsMatches)
     }
@@ -47,7 +48,7 @@ export const ViewAddProductsQuoter = () => {
     </Button>
     
 
-    return(
+    return( 
         <Container maxWidth="sm">
             <Grid container spacing={2}  alignItems='center' >
                 <Grid item xs={6}  md={6}>

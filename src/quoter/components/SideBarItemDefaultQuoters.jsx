@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux/es/exports'
 import { handleMobileOpen,  setActiveQuoterToEdit, setActiveQuoter, setIsAddProductQuoterProcess, setQuoterProcess, setQuoterSelected} from '../../store/quoter/quoterSlice'
 
 
-export const SideBarItemQuoters = (quoter) => {
+export const SideBarItemDefaultQuoters = (quoter) => {
 
   const {mobileOpen, isScreenCel} = useSelector(state => state.quoter) 
 
@@ -27,9 +27,9 @@ export const SideBarItemQuoters = (quoter) => {
 
   const onClickQuoter =()=>{
 
-      dispatch(setActiveQuoter(quoter))
+      dispatch(setActiveQuoter({...quoter, isDefaultQuoter: true}))
       dispatch(setActiveQuoterToEdit({title:quoter.title, description:quoter.description}))
-      dispatch(setQuoterSelected(quoter))
+      //dispatch(setQuoterSelected(quoter))
       dispatch(setIsAddProductQuoterProcess(false))
       dispatch(setQuoterProcess('View'))
       if(isScreenCel) dispatch(handleMobileOpen(!mobileOpen));
@@ -42,7 +42,7 @@ export const SideBarItemQuoters = (quoter) => {
       disablePadding>
         <ListItemButton onClick={onClickQuoter}>
           <ListItemIcon>
-            <CalculateOutlined />
+            <StarOutlineOutlined />
           </ListItemIcon>
               <Grid container>
                   <ListItemText primary={ newTitle } />
