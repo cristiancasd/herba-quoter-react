@@ -15,7 +15,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <QuoterApp />
       </HashRouter>
       {/*</BrowserRouter>*/}
-    </Provider>
+    </Provider> 
   //</React.StrictMode>
 )
 

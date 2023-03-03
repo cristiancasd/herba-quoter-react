@@ -17,7 +17,7 @@ import { ViewAddProductsQuoter } from "../views/ViewAddProductsQuoter"
 export const QuoterPage = () => {
 
   console.log('estoy en QuoterPage')
-
+ 
   const dispatch=useDispatch();
   
   const { quoterProcess, activeQuoter, isAddProductQuoterProcess,
@@ -37,7 +37,7 @@ export const QuoterPage = () => {
     dispatch(setNavBarSelection('quoters'))
 
     if(productsLoaded!=='ok'|| categoriesLoaded!=='ok' ){
-        console.log('aun cargando Loadings')
+        console.log('aun cargando Loadings') 
         dispatch(startLoadingCategories())
         dispatch(startLoadingProducts())     
         //dispatch(startLoadingQuoters(user.id))  

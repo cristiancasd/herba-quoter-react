@@ -81,10 +81,10 @@ export const AddProductQuoterItem=(product)=> {
             marginBottom: '15px' 
         
         }}>
-            <Grid container  >
+            <Grid container  > 
                 <Grid item xs={12} md={8}>
                     <Typography variant='h6' noWrap component='div'>
-                        {product.title}
+                        {product.title} 
                     </Typography> 
                     <Typography variant='h12' noWrap component='div'>
                         {product.description}
