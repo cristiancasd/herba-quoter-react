@@ -48,7 +48,7 @@ export const ViewAddProductsQuoter = () => {
     </Button>
     
 
-    return( 
+    return(  
         <Container maxWidth="sm">
             <Grid container spacing={2}  alignItems='center' >
                 <Grid item xs={6}  md={6}>
@@ -66,7 +66,7 @@ export const ViewAddProductsQuoter = () => {
                         
                         onChange={onSearchProduct}
                         sx={{border:'none', mb:1}}
-                    />
+                    /> 
                 </Grid>
             </Grid>
             

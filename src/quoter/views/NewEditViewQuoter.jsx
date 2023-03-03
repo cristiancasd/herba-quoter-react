@@ -99,7 +99,7 @@ export const NewEditViewQuoter = () => {
         padding: '10px',
         marginBottom:2,
         maxWidth: '100%'
-        }}>
+        }}> 
 
 
 

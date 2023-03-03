@@ -50,7 +50,7 @@ export const NewEditViewProduct = () => {
           quoterProcess==='Edit'
             ? dispatch(startUpdateProduct(formState, activeProduct.category))        
             : dispatch(startCreateProduct(formState)); 
-          dispatch(setOnSaving(false));
+          //dispatch(setOnSaving(false));
         }
     }, [onSaving])
 
@@ -83,7 +83,7 @@ export const NewEditViewProduct = () => {
                 price42= {price42} 
                 price50= {price50} 
                 sku= {sku} 
-                pv= {pv} 
+                pv= {pv}  
                 categoryId= {categoryId} 
             />}
             

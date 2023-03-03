@@ -331,32 +331,19 @@ export const startUploadingFiles = (files=[], activeProduct, ) => {
 
 
 export const startCreateQuoter=(quoter, products)=>{
-    console.log('___________quoter to save, ',quoter)
     return async(dispatch) =>{
         dispatch(communicatingBackend(true))
         try{
             const {data} = await quoterApiNode.post('/quoters/create', {...quoter, image:""});
             const quoterAdapted= adapteQuoter(data[0], products)
-            console.log('data response ', {quoterAdapted})
-            //dispatch(setActiveQuoter(quoterAdapted));
             dispatch(onAddNewQuoter(quoterAdapted))
             dispatch(onSuccessMessage('Quoter created'));
             setTimeout(()=>{
                 dispatch(clearSuccessMessage());
             },10);
         }catch(error){
-            console.log('error es ', error)
-            //console.log('error axios ', error.response.data)
-          
-            let errorToShow='';
-            (error.response.data.errors)
-                ?errorToShow= error.response.data.errors.map(err=>{
-                    return err.msg
-                 })
-                : errorToShow=error.response.data.message
-
-            dispatch(onErrorMessage(errorToShow.toString()))
-
+            const messageError= existQuoterError(error);
+            dispatch(onErrorMessage(messageError));
             setTimeout(()=>{
                 dispatch(clearErrorMessage());
             },10);
@@ -370,21 +357,15 @@ export const startUpdateQuoter=(quoter, products)=>{
         dispatch(communicatingBackend(true))
         try{
             const {data}= await quoterApiNode.put('/quoters/edit/'+quoter.id, {image:"", ...quoter });
-            console.log('data before adapte ', data)
             const quoterAdapted= adapteQuoter(data, products);
-            console.log('data response ', {quoterAdapted})
             dispatch(onUpdateQuoters(quoterAdapted));
             dispatch(onSuccessMessage('Quoter updated'));
             setTimeout(()=>{
                 dispatch(clearSuccessMessage());
             },10);
         }catch(error){
-            console.log('error', error)
-            console.log('error.response', error.response)
-            console.log('error.response.data', error.response.data)
-
-            dispatch(onErrorMessage('error deleting quoter'))
-
+            const messageError= existQuoterError(error);
+            dispatch(onErrorMessage(messageError));
             setTimeout(()=>{
                 dispatch(clearErrorMessage());
             },10);
@@ -398,38 +379,15 @@ export const startUpdateQuoter=(quoter, products)=>{
 export const startDeleteQuoter=(idQuoterToDelete)=>{
     return async (dispatch) =>{
         try{
-            console.log('to delete ', '/quoters/delete/'+idQuoterToDelete)
             const {data} = await quoterApiNode.delete('/quoters/delete/'+idQuoterToDelete);
-            console.log('data response delete ', {data});
-            console.log(' dispatch(onDeleteQuoter');
             dispatch(onDeleteQuoter(idQuoterToDelete))
-            console.log(' Success message');
             dispatch(onSuccessMessage(`Quoter deleted`));
             setTimeout(()=>{
                 dispatch(clearSuccessMessage());
             },10);
         }catch(error){
-            console.log('error es ', error)
-            console.log('error.response es ', error.response)
-
-            let errorToShow='';
-
-            if(error.response){
-                if(error.response.status==404)  errorToShow= 'route backend not found'
-                if(error.response.status!==404){
-                    (error.response.data.errors)
-                        ?errorToShow= error.response.data.errors.map(err=>{
-                            return err.msg
-                        })
-                        : errorToShow=error.response.data.message
-                }
-                
-            }else{
-                errorToShow= 'error, talk with the admin'
-            }
-           
-            dispatch(onErrorMessage(errorToShow.toString()))
-
+            const messageError= existQuoterError(error);
+            dispatch(onErrorMessage(messageError));
             setTimeout(()=>{
                 dispatch(clearErrorMessage());
             },10);
@@ -441,14 +399,10 @@ export const startDeleteQuoter=(idQuoterToDelete)=>{
 export const startUploadingImageQuoter=(files=[], products=[])=>{
     return async(dispatch, getState)=>{
         dispatch(communicatingBackend(true));
- 
         const {activeQuoter} = getState().quoter;
         const formData=new FormData();
-
         formData.append('archivo',files[0]);
-
         try{
-            console.log('form data es ',formData)
             const {data} = await quoterApiNode.put('/files/edit/'+activeQuoter.id, formData);
             const quoterAdapted= adapteQuoter(data, products)
             dispatch(onUpdateQuoters(quoterAdapted));
@@ -457,8 +411,8 @@ export const startUploadingImageQuoter=(files=[], products=[])=>{
                 dispatch(clearSuccessMessage());
             },10);
         }catch(error){
-            console.log('error', error)
-            dispatch(onErrorMessage('error upload image'))
+            const messageError= existQuoterError(error);
+            dispatch(onErrorMessage(messageError));
             setTimeout(()=>{
                 dispatch(clearErrorMessage());
             },10);
@@ -483,3 +437,16 @@ const existError=(error, type='', detail='')=>{
         return 'Network error'
     }             
 }
+
+const existQuoterError=(error)=>{
+    
+    try{
+        return error.response
+        ? error.response.data.errors[0].message
+        : 'Network Error Backend' ;
+    }catch{
+        return 'ERROR BACKEND, message dont exist'
+    }
+    
+}
+    

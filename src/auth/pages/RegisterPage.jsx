@@ -73,7 +73,7 @@ export const RegisterPage = () => {
           onSubmit={onSubmit}>
             <Grid container>
               <Grid item xs={12} sx={{mt:2}}>
-                <TextField 
+                <TextField  
                   required
                   label="Nombre completo"
                   type="text"
